@@ -26,6 +26,7 @@ import com.uber.athenax.backend.server.InstanceStateUpdateListener;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.JobManagerOptions;
 import org.apache.flink.util.Preconditions;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
@@ -210,6 +211,9 @@ public class InstanceManager implements AutoCloseable {
         if (instance == null) {
           LOG.warn("Failed to retrieve instance info for {}:{}", cluster.name(), report.getApplicationId());
         } else {
+          instance.status().setAllocatedVCores(instance.status().getAllocatedVCores() - 1);
+          instance.status().setAllocatedMB(instance.status().getAllocatedMB()
+                  - flinkConf.getInteger(JobManagerOptions.JOB_MANAGER_HEAP_MEMORY));
           newInstances.put(instance.metadata().uuid(), instance);
         }
       }
