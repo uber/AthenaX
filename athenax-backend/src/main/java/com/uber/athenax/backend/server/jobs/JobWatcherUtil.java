@@ -150,7 +150,8 @@ final class JobWatcherUtil {
 
   static JobDefinitionDesiredstate computeActualState(InstanceInfo info) {
     JobDefinitionResource r = new JobDefinitionResource()
-        .memory(info.status().getAllocatedMB())
+        .memory(info.status().getAllocatedMB() / (info.status().getAllocatedVCores() != 0
+            ? info.status().getAllocatedVCores() : 1))
         .vCores(info.status().getAllocatedVCores());
     JobDefinitionDesiredstate s = new JobDefinitionDesiredstate()
         .clusterId(info.clusterName())
