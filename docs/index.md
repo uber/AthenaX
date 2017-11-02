@@ -5,7 +5,7 @@ Welcome to the documentation portal of AthenaX!
 
 AthenaX is a streaming analytics platform that enables users to run production-quality, large-scale streaming analytics using Structured Query Language (SQL). AthenaX was released and open sourced by [Uber Technologies][ubeross]. It is capable of scaling across hundreds of machines and processing hundreds of billions of real-time events daily.
 
-If you can't find what you are looking for, we'd love to hear from you either on [Github](https://github.com/uber/AthenaX/issues), or on our [forum](https://groups.google.com/forum/#!forum/athenax-users).
+If you can't find what you are looking for, we'd love to hear from you either on [Github](https://github.com/uber/AthenaX/issues), or on our [mailing list](https://groups.google.com/forum/#!forum/athenax-users).
 
 ## Features
 
