@@ -41,8 +41,9 @@
   </properties>
 
   <modules>
-    <module>athenax-vm-api</module>
     <module>athenax-backend</module>
+    <module>athenax-backend-core</module>
+    <module>athenax-vm-api</module>
     <module>athenax-vm-compiler</module>
     <module>athenax-vm-connectors/athenax-vm-connector-common</module>
     <module>athenax-vm-connectors/athenax-vm-connector-kafka</module>
@@ -180,6 +181,11 @@
       </dependency>
       <dependency>
         <groupId>com.uber.athenax</groupId>
+        <artifactId>athenax-backend-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.uber.athenax</groupId>
         <artifactId>athenax-vm-compiler</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -258,6 +264,11 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>3.5</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.flink</groupId>
+        <artifactId>flink-clients_${scala.binary.version}</artifactId>
+        <version>${flink.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.flink</groupId>
