@@ -20,7 +20,9 @@ package com.uber.athenax.backend.core.api;
 
 import com.uber.athenax.backend.core.entities.AthenaXConfiguration;
 import com.uber.athenax.backend.core.impl.instance.InstanceInfo;
+import com.uber.athenax.backend.core.impl.instance.InstanceMetadata;
 import com.uber.athenax.backend.rest.api.InstanceStatus;
+import com.uber.athenax.backend.rest.api.JobDefinition;
 import com.uber.athenax.backend.rest.api.JobDefinitionDesiredState;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 
@@ -58,12 +60,14 @@ public interface ClusterHandler {
 
   /**
    * Create an actual Flink application on this cluster.
-   * @param job
+   * @param instanceMetadata
+   * @param compiledJob
    * @param desiredState
    * @return
    */
   InstanceStatus deployApplication(
-      JobCompilationResult job,
+      InstanceMetadata instanceMetadata,
+      JobCompilationResult compiledJob,
       JobDefinitionDesiredState desiredState) throws IOException;
 
   /**

@@ -45,12 +45,12 @@ import static com.uber.athenax.backend.core.impl.CoreUtils.isActiveState;
  * This is a basic implementation of the instance handler
  * It performs passive state update on API call.
  */
-public class DirectDeployInstanceHandlerImpl implements InstanceHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(DirectDeployInstanceHandlerImpl.class);
+public class DirectDeployInstanceHandler implements InstanceHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(DirectDeployInstanceHandler.class);
   private JobStoreHandler jobStoreHandler;
   private Map<String, ClusterHandler> clusters;
 
-  public DirectDeployInstanceHandlerImpl(
+  public DirectDeployInstanceHandler(
       JobStoreHandler jobStoreHandler,
       Map<String, ClusterHandler> clusterHandlerMap) {
     this.clusters = clusterHandlerMap;
@@ -89,7 +89,7 @@ public class DirectDeployInstanceHandlerImpl implements InstanceHandler {
     InstanceMetadata metadata = new InstanceMetadata(instanceUUID, jobUuid, jobDefinition.getTag().toString());
     InstanceInfo instance = null;
 
-    InstanceStatus status = handler.deployApplication(compilationResult, desiredState);
+    InstanceStatus status = handler.deployApplication(metadata, compilationResult, desiredState);
     instance = new InstanceInfo(clusterId, status.getApplicationId(), metadata, status);
 
     jobStoreHandler.insertInstance(instanceUUID, instance);
@@ -134,7 +134,7 @@ public class DirectDeployInstanceHandlerImpl implements InstanceHandler {
         throw new UnsupportedOperationException("Job has not been recompiled, cannot update instance!"
             + "instance has to recompile against the latest environment!");
       }
-      status = handler.deployApplication(compilationResult, desiredState);
+      status = handler.deployApplication(instance.metadata(), compilationResult, desiredState);
     }
 
     if (status != null) {

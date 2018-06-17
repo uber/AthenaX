@@ -22,10 +22,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.uber.athenax.backend.core.impl.cluster.StandaloneFlinkClusterHandlerImpl;
-import com.uber.athenax.backend.core.impl.instance.DirectDeployInstanceHandlerImpl;
-import com.uber.athenax.backend.core.impl.job.InMemoryJobStoreHandlerImpl;
-import com.uber.athenax.vm.api.AthenaXTableCatalogProvider;
+import com.uber.athenax.backend.core.impl.cluster.LocalMiniClusterHandler;
+import com.uber.athenax.backend.core.impl.instance.DirectDeployInstanceHandler;
+import com.uber.athenax.backend.core.impl.job.InMemoryJobStoreHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,11 +61,11 @@ public class AthenaXConfiguration {
     this.masterUri = null;
     this.catalogProvider = null;
     this.jobStoreConfig = new JobStoreConfig().jobStoreClass(
-        InMemoryJobStoreHandlerImpl.class.getCanonicalName());
+        InMemoryJobStoreHandler.class.getCanonicalName());
     this.instanceConfig = new InstanceConfig().instanceHandlerClass(
-        DirectDeployInstanceHandlerImpl.class.getCanonicalName());
+        DirectDeployInstanceHandler.class.getCanonicalName());
     this.clusters = Collections.singletonMap("local", new ClusterConfig().clusterHandlerClass(
-        StandaloneFlinkClusterHandlerImpl.class.getCanonicalName()));
+        LocalMiniClusterHandler.class.getCanonicalName()));
     this.extras = Collections.emptyMap();
   }
 

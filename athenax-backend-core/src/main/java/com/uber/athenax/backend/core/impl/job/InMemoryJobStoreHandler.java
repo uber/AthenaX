@@ -21,6 +21,7 @@ package com.uber.athenax.backend.core.impl.job;
 import com.uber.athenax.backend.core.entities.AthenaXConfiguration;
 import com.uber.athenax.backend.core.api.JobStoreHandler;
 import com.uber.athenax.backend.core.impl.instance.InstanceInfo;
+import com.uber.athenax.backend.rest.api.InstanceState;
 import com.uber.athenax.backend.rest.api.JobDefinition;
 
 import java.io.IOException;
@@ -33,11 +34,11 @@ import java.util.stream.Collectors;
 
 import static com.uber.athenax.backend.core.impl.CoreUtils.isActiveState;
 
-public class InMemoryJobStoreHandlerImpl implements JobStoreHandler {
+public class InMemoryJobStoreHandler implements JobStoreHandler {
   private final ConcurrentHashMap<UUID, JobDefinition> jobDefinitionMap;
   private final ConcurrentHashMap<UUID, InstanceInfo> instanceInfoMap;
 
-  public InMemoryJobStoreHandlerImpl() {
+  public InMemoryJobStoreHandler() {
     this.jobDefinitionMap = new ConcurrentHashMap<>();
     this.instanceInfoMap = new ConcurrentHashMap<>();
   }
@@ -64,7 +65,18 @@ public class InMemoryJobStoreHandlerImpl implements JobStoreHandler {
 
   @Override
   public List<InstanceInfo> listAllInstances(Properties props) throws IOException {
-    return new ArrayList<>(instanceInfoMap.values());
+    return new ArrayList<>(instanceInfoMap.values()).stream().filter(instance -> {
+      if (props == null) {
+        return true;
+      }
+      boolean filterResult = true;
+      if (props.containsKey("InstanceState")) {
+        InstanceState state = InstanceState.fromValue((String) props.get("InstanceState"));
+        filterResult = filterResult &&
+            instance.status().getCurrentState().equals(state);
+      }
+      return filterResult;
+    }).collect(Collectors.toList());
   }
 
   @Override

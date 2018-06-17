@@ -18,27 +18,19 @@
 
 package com.uber.athenax.backend.core.impl;
 
-import com.uber.athenax.backend.rest.api.InstanceState;
+import org.apache.flink.runtime.jobgraph.JobGraph;
+import org.apache.flink.runtime.jobgraph.JobVertex;
+import org.apache.flink.runtime.operators.testutils.DummyInvokable;
 
-import java.io.IOException;
-import java.util.EnumSet;
-
-import static com.uber.athenax.backend.rest.api.InstanceState.ACCEPTED;
-import static com.uber.athenax.backend.rest.api.InstanceState.NEW;
-import static com.uber.athenax.backend.rest.api.InstanceState.NEW_SAVING;
-import static com.uber.athenax.backend.rest.api.InstanceState.RUNNING;
-import static com.uber.athenax.backend.rest.api.InstanceState.SUBMITTED;
-
-public final class CoreUtils {
-
-  private static final EnumSet<InstanceState> ACTIVE_STATE =
-      EnumSet.of(NEW, NEW_SAVING, SUBMITTED, ACCEPTED, RUNNING);
-
-  public static boolean isActiveState(InstanceState state) {
-    return ACTIVE_STATE.contains(state);
+public final class TestUtil {
+  private TestUtil() {
   }
 
-  public static IOException wrapAsIOException(Exception e) {
-    return new IOException(e);
+  public static JobGraph trivialJobGraph() {
+    JobGraph g = new JobGraph();
+    JobVertex v = new JobVertex("1");
+    v.setInvokableClass(DummyInvokable.class);
+    g.addVertex(v);
+    return g;
   }
 }
