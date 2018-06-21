@@ -26,6 +26,7 @@ import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -57,7 +58,7 @@ public class JobDeployerITest {
         JobDeployer deployer = new JobDeployer(clusterConf, client, executor, flinkConf);
         appId = deployer.createApplication();
         InstanceMetadata md = new InstanceMetadata(UUID.randomUUID(), UUID.randomUUID());
-        JobConf jobConf = new JobConf(appId, "test", Collections.emptyList(), null, 1, 2048, md);
+        JobConf jobConf = new JobConf(appId, "test", Collections.emptyList(), null, 1, 1, 2048, md);
         deployer.start(JobITestUtil.trivialJobGraph(), jobConf);
 
         YarnApplicationState state = MiniAthenaXCluster.pollFinishedApplicationState(client, appId);

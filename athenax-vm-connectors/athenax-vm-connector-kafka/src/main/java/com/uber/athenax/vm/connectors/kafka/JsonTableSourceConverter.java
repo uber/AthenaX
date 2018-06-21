@@ -49,9 +49,8 @@ public class JsonTableSourceConverter implements TableSourceConverter<JsonTableS
   public JsonTableSource fromExternalCatalogTable(ExternalCatalogTable table) {
     Map<String, String> prop = table.properties();
     String topic = prop.get(TOPIC_NAME_KEY);
-    RowTypeInfo rowType = KafkaUtils.toRowType(table.schema());
 
     Properties conf = KafkaUtils.getSubProperties(prop, KAFKA_CONFIG_PREFIX);
-    return new JsonTableSource(topic, conf, rowType);
+    return new JsonTableSource(topic, conf, table.schema());
   }
 }

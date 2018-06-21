@@ -188,6 +188,7 @@ public class InstanceManager implements AutoCloseable {
         job.additionalJars(),
         state.getResource().getQueue(),
         state.getResource().getVCores(),
+        state.getResource().getExecutionSlots(),
         state.getResource().getMemory(),
         md);
 

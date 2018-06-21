@@ -59,21 +59,33 @@ public class JobCompiler {
   }
 
   public static void main(String[] args) throws IOException {
-    StreamExecutionEnvironment execEnv = StreamExecutionEnvironment.createLocalEnvironment();
-    StreamTableEnvironment env = StreamTableEnvironment.getTableEnvironment(execEnv);
-    execEnv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-    CompilationResult res = new CompilationResult();
-
+    CompilationResult res = null;
     try {
       JobDescriptor job = getJobConf(System.in);
-      res.jobGraph(new JobCompiler(env, job).getJobGraph());
+      res = compileJob(job);
     } catch (Throwable e) {
+      res = new CompilationResult();
       res.remoteThrowable(e);
     }
 
     try (OutputStream out = chooseOutputStream(args)) {
       out.write(res.serialize());
     }
+  }
+
+  public static CompilationResult compileJob(JobDescriptor job) {
+    StreamExecutionEnvironment execEnv = StreamExecutionEnvironment.createLocalEnvironment();
+    StreamTableEnvironment env = StreamTableEnvironment.getTableEnvironment(execEnv);
+    execEnv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    CompilationResult res = new CompilationResult();
+
+    try {
+      res.jobGraph(new JobCompiler(env, job).getJobGraph());
+    } catch (IOException e) {
+      res.remoteThrowable(e);
+    }
+
+    return res;
   }
 
   private static OutputStream chooseOutputStream(String[] args) throws IOException {

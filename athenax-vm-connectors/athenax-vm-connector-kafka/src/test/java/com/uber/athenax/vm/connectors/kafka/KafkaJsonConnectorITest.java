@@ -18,7 +18,6 @@
 
 package com.uber.athenax.vm.connectors.kafka;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import kafka.api.FetchRequest;
 import kafka.api.FetchRequestBuilder;
 import kafka.javaapi.FetchResponse;
@@ -29,7 +28,8 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.MetricOptions;
 import org.apache.flink.metrics.jmx.JMXReporter;
 import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
-import org.apache.flink.shaded.com.google.common.collect.ImmutableMap;
+import org.apache.flink.shaded.guava18.com.google.common.collect.ImmutableMap;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -137,7 +137,7 @@ public class KafkaJsonConnectorITest {
         }
         assertTrue("The Kafka consumer offset makes no progress", found);
       } finally {
-        flink.shutdown();
+        flink.stop();
       }
 
       SimpleConsumer consumer = null;

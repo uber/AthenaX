@@ -50,6 +50,10 @@ class JobConf {
    */
   private final long taskManagerCount;
   /**
+   * The number of executor slot per TaskManager
+   */
+  private final long slotCountPerTaskManager;
+  /**
    * The size of the heap used by each TaskManager.
    */
   private final long taskManagerMemoryMb;
@@ -65,6 +69,7 @@ class JobConf {
       List<Path> userProvidedJars,
       String queue,
       long taskManagerCount,
+      long slotCountPerTaskManager,
       long taskManagerMemoryMb,
       InstanceMetadata metadata) {
     this.yarnAppId = yarnAppId;
@@ -73,6 +78,7 @@ class JobConf {
     this.queue = queue;
     this.taskManagerCount = taskManagerCount;
     this.taskManagerMemoryMb = taskManagerMemoryMb;
+    this.slotCountPerTaskManager = slotCountPerTaskManager;
     this.metadata = metadata;
   }
 
@@ -94,6 +100,10 @@ class JobConf {
 
   long taskManagerCount() {
     return taskManagerCount;
+  }
+
+  public long slotCountPerTaskManager() {
+    return slotCountPerTaskManager;
   }
 
   long taskManagerMemoryMb() {
