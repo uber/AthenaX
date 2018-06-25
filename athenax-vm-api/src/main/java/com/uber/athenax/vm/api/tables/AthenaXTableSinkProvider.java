@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.uber.athenax.vm.api;
+package com.uber.athenax.vm.api.tables;
 
 import org.apache.flink.table.catalog.ExternalCatalogTable;
 import org.apache.flink.table.sinks.AppendStreamTableSink;

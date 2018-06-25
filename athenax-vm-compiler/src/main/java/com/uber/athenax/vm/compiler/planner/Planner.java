@@ -18,7 +18,7 @@
 
 package com.uber.athenax.vm.compiler.planner;
 
-import com.uber.athenax.vm.api.AthenaXTableCatalog;
+import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
 import com.uber.athenax.vm.compiler.executor.CompilationResult;
 import com.uber.athenax.vm.compiler.executor.ContainedExecutor;
 import com.uber.athenax.vm.compiler.executor.JobDescriptor;

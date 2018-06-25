@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.uber.athenax.vm.api;
+package com.uber.athenax.vm.api.tables;
 
 import java.util.List;
 import java.util.Map;

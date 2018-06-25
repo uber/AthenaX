@@ -18,7 +18,7 @@
 
 package com.uber.athenax.vm.compiler.executor;
 
-import com.uber.athenax.vm.api.AthenaXTableCatalog;
+import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
 import org.apache.flink.table.api.CatalogNotExistException;
 import org.apache.flink.table.api.TableNotExistException;
 import org.apache.flink.table.catalog.ExternalCatalog;

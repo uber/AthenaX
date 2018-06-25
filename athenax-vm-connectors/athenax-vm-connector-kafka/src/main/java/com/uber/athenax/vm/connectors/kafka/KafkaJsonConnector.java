@@ -18,7 +18,7 @@
 
 package com.uber.athenax.vm.connectors.kafka;
 
-import com.uber.athenax.vm.api.AthenaXTableSinkProvider;
+import com.uber.athenax.vm.api.tables.AthenaXTableSinkProvider;
 import org.apache.flink.streaming.connectors.kafka.Kafka09JsonTableSink;
 import org.apache.flink.streaming.connectors.kafka.partitioner.FlinkKafkaPartitioner;
 import org.apache.flink.table.catalog.ExternalCatalogTable;

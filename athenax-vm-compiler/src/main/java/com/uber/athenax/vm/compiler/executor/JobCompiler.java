@@ -18,11 +18,11 @@
 
 package com.uber.athenax.vm.compiler.executor;
 
-import com.uber.athenax.vm.api.AthenaXAggregateFunction;
-import com.uber.athenax.vm.api.AthenaXScalarFunction;
-import com.uber.athenax.vm.api.AthenaXTableCatalog;
-import com.uber.athenax.vm.api.AthenaXTableFunction;
-import com.uber.athenax.vm.api.AthenaXTableSinkProvider;
+import com.uber.athenax.vm.api.functions.AthenaXAggregateFunction;
+import com.uber.athenax.vm.api.functions.AthenaXScalarFunction;
+import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
+import com.uber.athenax.vm.api.functions.AthenaXTableFunction;
+import com.uber.athenax.vm.api.tables.AthenaXTableSinkProvider;
 import org.apache.flink.runtime.jobgraph.JobGraph;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -30,6 +30,7 @@ import org.apache.flink.streaming.api.graph.StreamGraph;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.ExternalCatalogTable;
+import org.apache.flink.table.descriptors.DescriptorProperties;
 import org.apache.flink.table.functions.AggregateFunction;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.apache.flink.table.functions.TableFunction;
@@ -155,9 +156,8 @@ public class JobCompiler {
 
   private AppendStreamTableSink<Row> getOutputTable(
       ExternalCatalogTable output) throws IOException {
-    String tableType = output.tableType();
-    AthenaXTableSinkProvider c = TableSinkRegistry.getProvider(tableType);
-    Preconditions.checkNotNull(c, "Cannot find output connectors for " + tableType);
+    AthenaXTableSinkProvider c = TableSinkProviderRegistry.getProvider(output);
+    Preconditions.checkNotNull(c, "Cannot find output connectors for " + output);
     return c.getAppendStreamTableSink(output);
   }
 }

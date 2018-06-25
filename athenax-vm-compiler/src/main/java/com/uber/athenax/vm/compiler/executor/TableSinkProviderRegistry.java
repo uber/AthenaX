@@ -18,14 +18,18 @@
 
 package com.uber.athenax.vm.compiler.executor;
 
-import com.uber.athenax.vm.api.AthenaXTableSinkProvider;
+import com.uber.athenax.vm.api.tables.AthenaXTableSinkProvider;
+import org.apache.flink.table.catalog.ExternalCatalogTable;
+import org.apache.flink.table.descriptors.ConnectorDescriptorValidator;
+import org.apache.flink.table.descriptors.DescriptorProperties;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-final class TableSinkRegistry {
+@SuppressWarnings("deprecated")
+final class TableSinkProviderRegistry {
   private static final Map<String, AthenaXTableSinkProvider> PROVIDERS;
 
   static {
@@ -36,10 +40,13 @@ final class TableSinkRegistry {
     PROVIDERS = Collections.unmodifiableMap(providers);
   }
 
-  private TableSinkRegistry() {
+  private TableSinkProviderRegistry() {
   }
 
-  static AthenaXTableSinkProvider getProvider(String type) {
-    return PROVIDERS.get(type);
+  static AthenaXTableSinkProvider getProvider(ExternalCatalogTable table) {
+    DescriptorProperties properties = new DescriptorProperties(true);
+    table.addProperties(properties);
+    String connectorType = properties.getString(ConnectorDescriptorValidator.CONNECTOR_TYPE());
+    return PROVIDERS.get(connectorType);
   }
 }

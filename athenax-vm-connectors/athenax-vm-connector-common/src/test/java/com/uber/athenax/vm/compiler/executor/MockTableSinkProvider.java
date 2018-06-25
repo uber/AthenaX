@@ -18,9 +18,11 @@
 
 package com.uber.athenax.vm.compiler.executor;
 
-import com.uber.athenax.vm.api.AthenaXTableSinkProvider;
+import com.uber.athenax.vm.api.tables.AthenaXTableSinkProvider;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.ExternalCatalogTable;
+import org.apache.flink.table.descriptors.DescriptorProperties;
 import org.apache.flink.table.sinks.AppendStreamTableSink;
 import org.apache.flink.table.sinks.BatchTableSink;
 import org.apache.flink.types.Row;
@@ -35,7 +37,10 @@ public class MockTableSinkProvider implements AthenaXTableSinkProvider {
 
   @Override
   public AppendStreamTableSink<Row> getAppendStreamTableSink(ExternalCatalogTable table) throws IOException {
-    RowTypeInfo type = new RowTypeInfo(table.schema().getTypes(), table.schema().getColumnNames());
+    DescriptorProperties params = new DescriptorProperties(true);
+    table.addProperties(params);
+    TableSchema tableSchema = params.getTableSchema(MockExternalCatalogTable.TABLE_SCHEMA_CONNECTOR_PROPERTY);
+    RowTypeInfo type = new RowTypeInfo(tableSchema.getTypes(), tableSchema.getColumnNames());
     return new MockAppendStreamTableSink(type);
   }
 
