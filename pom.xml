@@ -46,7 +46,6 @@
     <module>athenax-vm-compiler</module>
     <module>athenax-vm-connectors/athenax-vm-connector-common</module>
     <module>athenax-vm-connectors/athenax-vm-connector-kafka</module>
-    <module>athenax-tests</module>
   </modules>
 
   <dependencyManagement>

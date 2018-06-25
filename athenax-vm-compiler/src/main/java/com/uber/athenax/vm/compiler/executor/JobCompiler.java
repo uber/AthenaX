@@ -22,7 +22,7 @@ import com.uber.athenax.vm.api.AthenaXAggregateFunction;
 import com.uber.athenax.vm.api.AthenaXScalarFunction;
 import com.uber.athenax.vm.api.AthenaXTableCatalog;
 import com.uber.athenax.vm.api.AthenaXTableFunction;
-import com.uber.athenax.vm.api.DataSinkProvider;
+import com.uber.athenax.vm.api.AthenaXTableSinkProvider;
 import org.apache.flink.runtime.jobgraph.JobGraph;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -105,7 +105,7 @@ public class JobCompiler {
     this
         .registerUdfs()
         .registerInputCatalogs();
-    Table table = env.sql(job.sql());
+    Table table = env.sqlQuery(job.sql());
     for (String t : job.outputs().listTables()) {
       table.writeToSink(getOutputTable(job.outputs().getTable(t)));
     }
@@ -156,7 +156,7 @@ public class JobCompiler {
   private AppendStreamTableSink<Row> getOutputTable(
       ExternalCatalogTable output) throws IOException {
     String tableType = output.tableType();
-    DataSinkProvider c = DataSinkRegistry.getProvider(tableType);
+    AthenaXTableSinkProvider c = TableSinkRegistry.getProvider(tableType);
     Preconditions.checkNotNull(c, "Cannot find output connectors for " + tableType);
     return c.getAppendStreamTableSink(output);
   }

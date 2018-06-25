@@ -26,10 +26,10 @@ import org.apache.flink.types.Row;
 import java.io.IOException;
 
 /**
- * A DataSinkProvider constructs a data sink from an {@link ExternalCatalogTable}
+ * A AthenaXTableSinkProvider constructs a data sink from an {@link ExternalCatalogTable}
  * so that AthenaX can pipe the data to the external system.
  */
-public interface DataSinkProvider {
+public interface AthenaXTableSinkProvider {
   /**
    * The scheme that identifies the data sink.
    */

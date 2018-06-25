@@ -18,28 +18,28 @@
 
 package com.uber.athenax.vm.compiler.executor;
 
-import com.uber.athenax.vm.api.DataSinkProvider;
+import com.uber.athenax.vm.api.AthenaXTableSinkProvider;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-final class DataSinkRegistry {
-  private static final Map<String, DataSinkProvider> PROVIDERS;
+final class TableSinkRegistry {
+  private static final Map<String, AthenaXTableSinkProvider> PROVIDERS;
 
   static {
-    HashMap<String, DataSinkProvider> providers = new HashMap<>();
-    ServiceLoader<DataSinkProvider> loaders =
-        ServiceLoader.load(DataSinkProvider.class);
+    HashMap<String, AthenaXTableSinkProvider> providers = new HashMap<>();
+    ServiceLoader<AthenaXTableSinkProvider> loaders =
+        ServiceLoader.load(AthenaXTableSinkProvider.class);
     loaders.forEach(x -> providers.put(x.getType(), x));
     PROVIDERS = Collections.unmodifiableMap(providers);
   }
 
-  private DataSinkRegistry() {
+  private TableSinkRegistry() {
   }
 
-  static DataSinkProvider getProvider(String type) {
+  static AthenaXTableSinkProvider getProvider(String type) {
     return PROVIDERS.get(type);
   }
 }

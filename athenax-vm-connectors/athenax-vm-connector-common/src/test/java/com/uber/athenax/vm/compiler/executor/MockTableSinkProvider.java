@@ -18,7 +18,7 @@
 
 package com.uber.athenax.vm.compiler.executor;
 
-import com.uber.athenax.vm.api.DataSinkProvider;
+import com.uber.athenax.vm.api.AthenaXTableSinkProvider;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.catalog.ExternalCatalogTable;
 import org.apache.flink.table.sinks.AppendStreamTableSink;
@@ -27,7 +27,7 @@ import org.apache.flink.types.Row;
 
 import java.io.IOException;
 
-public class MockDataSinkProvider implements DataSinkProvider {
+public class MockTableSinkProvider implements AthenaXTableSinkProvider {
   @Override
   public String getType() {
     return "mock";
