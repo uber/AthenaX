@@ -35,6 +35,8 @@ import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.ExternalCatalogTable;
+import org.apache.flink.table.descriptors.ConnectorDescriptor;
+import org.apache.flink.table.descriptors.DescriptorProperties;
 import org.apache.flink.table.sinks.AppendStreamTableSink;
 import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.table.sources.StreamTableSource;
@@ -46,6 +48,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 
 import org.junit.Test;
+import scala.Option;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -55,8 +58,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import static com.uber.athenax.vm.connectors.kafka.KafkaConnectorConfigKeys.KAFKA_CONFIG_PREFIX;
-import static com.uber.athenax.vm.connectors.kafka.KafkaConnectorConfigKeys.TOPIC_NAME_KEY;
+import static com.uber.athenax.vm.connectors.kafka.KafkaConnectorDescriptorValidator.KAFKA_CONFIG_PREFIX;
+import static com.uber.athenax.vm.connectors.kafka.KafkaConnectorDescriptorValidator.TOPIC_NAME_KEY;
+import static com.uber.athenax.vm.connectors.kafka.KafkaConnectorDescriptorValidator.TOPIC_SCHEMA_KEY;
 import static org.apache.flink.api.common.typeinfo.BasicTypeInfo.INT_TYPE_INFO;
 import static org.apache.flink.configuration.ConfigConstants.METRICS_REPORTER_CLASS_SUFFIX;
 import static org.apache.flink.configuration.ConfigConstants.METRICS_REPORTER_PREFIX;
@@ -99,20 +103,14 @@ public class KafkaJsonConnectorITest {
         producer.send(new ProducerRecord<>(sourceTopic, MAPPER.writeValueAsBytes(ImmutableMap.of("foo", 2))));
       }
 
-      JsonTableSourceConverter converter = new JsonTableSourceConverter();
+      JsonTableSourceFactory factory = new JsonTableSourceFactory();
 
-      Map<String, String> sourceTableProp = new HashMap<>();
-      sourceTableProp.put(KAFKA_CONFIG_PREFIX + ConsumerConfig.GROUP_ID_CONFIG, "foo");
-      sourceTableProp.put(KAFKA_CONFIG_PREFIX + ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerAddress);
-      sourceTableProp.put(KAFKA_CONFIG_PREFIX + ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-      sourceTableProp.put(TOPIC_NAME_KEY, sourceTopic);
-      ExternalCatalogTable sourceTable = mockExternalCatalogTable(sourceTableProp);
-      StreamTableSource<Row> source = converter.fromExternalCatalogTable(sourceTable);
+      ExternalCatalogTable sourceTable = mockExternalCatalogTable(sourceTopic, brokerAddress);
+      DescriptorProperties props = new DescriptorProperties(true);
+      sourceTable.addProperties(props);
+      StreamTableSource<Row> source = factory.create(props.asMap());
 
-      Map<String, String> sinkTableProp = new HashMap<>();
-      sinkTableProp.put(KAFKA_CONFIG_PREFIX + ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerAddress);
-      sinkTableProp.put(TOPIC_NAME_KEY, sinkTopic);
-      ExternalCatalogTable sinkTable = mockExternalCatalogTable(sinkTableProp);
+      ExternalCatalogTable sinkTable = mockExternalCatalogTable(sinkTopic, brokerAddress);
 
       TableSink<Row> sink = connector.getAppendStreamTableSink(sinkTable)
           .configure(schema.getColumnNames(), schema.getTypes());
@@ -164,12 +162,19 @@ public class KafkaJsonConnectorITest {
     return new KafkaProducer<>(prop);
   }
 
-  private static ExternalCatalogTable mockExternalCatalogTable(Map<String, String> props) {
-    ExternalCatalogTable table = mock(ExternalCatalogTable.class);
+  private static ExternalCatalogTable mockExternalCatalogTable(String topic, String brokerAddress) {
     TableSchema schema = new TableSchema(new String[] {"foo"}, new TypeInformation[] {INT_TYPE_INFO});
-    doReturn(schema).when(table).schema();
-    doReturn(props).when(table).properties();
-    doReturn("kafka+json").when(table).tableType();
-    return table;
+    ConnectorDescriptor descriptor = new ConnectorDescriptor("kafka+json", 1, false) {
+      @Override
+      public void addConnectorProperties(DescriptorProperties properties) {
+        properties.putTableSchema(TOPIC_SCHEMA_KEY, schema);
+        properties.putString(TOPIC_NAME_KEY, topic);
+        properties.putString(KAFKA_CONFIG_PREFIX + "." + ConsumerConfig.GROUP_ID_CONFIG, "foo");
+        properties.putString(KAFKA_CONFIG_PREFIX + "." + ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerAddress);
+        properties.putString(KAFKA_CONFIG_PREFIX + "." + ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+      }
+    };
+
+    return new ExternalCatalogTable(descriptor, Option.empty(), Option.empty(), Option.empty(), Option.empty());
   }
 }

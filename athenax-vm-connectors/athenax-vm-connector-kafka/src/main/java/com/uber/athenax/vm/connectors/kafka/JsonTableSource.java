@@ -26,6 +26,9 @@ import org.apache.flink.table.sources.DefinedProctimeAttribute;
 import java.util.Properties;
 
 class JsonTableSource extends Kafka09JsonTableSource implements DefinedProctimeAttribute {
+  static final String KAFKA_JSON_TABLE_SOURCE_TYPE = "kafka+json";
+  static final int KAFKA_JSON_TABLE_SOURCE_VERSION = 1;
+
   JsonTableSource(String topic, Properties properties, TableSchema schema) {
     super(topic, properties, schema, schema);
     super.setStartupMode(StartupMode.GROUP_OFFSETS);

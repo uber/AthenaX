@@ -54,7 +54,6 @@ public class MockTableSourceFactory implements TableSourceFactory<Row> {
   public List<String> supportedProperties() {
     List<String> properties = new ArrayList<>();
 
-    // kafka
     properties.add(TABLE_DATA_CONNECTOR_PROPERTY);
     properties.add(TABLE_SCHEMA_CONNECTOR_PROPERTY + ".#." + "name");
     properties.add(TABLE_SCHEMA_CONNECTOR_PROPERTY + ".#." + "type");

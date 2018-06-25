@@ -255,11 +255,6 @@ class AthenaXYarnClusterDescriptor extends AbstractYarnClusterDescriptor {
   }
 
   @Override
-  public boolean isDetachedMode() {
-    return true;
-  }
-
-  @Override
   protected ClusterClient<ApplicationId> createYarnClusterClient(
       AbstractYarnClusterDescriptor clusterDescriptor,
       int numberTaskManagers,
