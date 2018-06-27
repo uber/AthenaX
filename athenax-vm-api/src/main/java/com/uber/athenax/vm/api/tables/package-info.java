@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
- * This packages contains the public APIs that can be used to extend AthenaX,
- * including the connectors, user-define functions and the catalogs.
+ * This packages contains the public APIs that can be used to extend AthenaX.
+ * including the connectors, table sources/sinks and the catalogs
  */
-package com.uber.athenax.vm.api;
+package com.uber.athenax.vm.api.tables;

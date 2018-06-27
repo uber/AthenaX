@@ -31,7 +31,6 @@ import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;

@@ -42,6 +42,7 @@ class JsonTableSource extends Kafka09JsonTableSource {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public List<RowtimeAttributeDescriptor> getRowtimeAttributeDescriptors() {
     return (List<RowtimeAttributeDescriptor>) Collections.EMPTY_LIST;
   }

@@ -67,7 +67,8 @@ class JobDeployer {
   }
 
   void start(JobGraph job, JobConf desc) throws Exception {
-    AthenaXYarnClusterDescriptor descriptor = new AthenaXYarnClusterDescriptor(clusterConf, yarnClient, flinkConf, desc);
+    AthenaXYarnClusterDescriptor descriptor =
+        new AthenaXYarnClusterDescriptor(clusterConf, yarnClient, flinkConf, desc);
     start(descriptor, job);
   }
 

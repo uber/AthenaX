@@ -53,8 +53,6 @@ import scala.Option;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -65,8 +63,6 @@ import static org.apache.flink.api.common.typeinfo.BasicTypeInfo.INT_TYPE_INFO;
 import static org.apache.flink.configuration.ConfigConstants.METRICS_REPORTER_CLASS_SUFFIX;
 import static org.apache.flink.configuration.ConfigConstants.METRICS_REPORTER_PREFIX;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 public class KafkaJsonConnectorITest {
   private static final ObjectMapper MAPPER = new ObjectMapper();

@@ -31,21 +31,19 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
- * External Catalog Table based on mock data and mock schema
+ * External Catalog Table based on mock data and mock schema.
  */
 public class MockExternalCatalogTable implements Serializable {
-  private final RowTypeInfo schema;
-  private final List<Row> data;
-
   static final String TABLE_SCHEMA_CONNECTOR_PROPERTY = "table.schema";
   static final String TABLE_DATA_CONNECTOR_PROPERTY = "table.data";
   static final String CONNECTOR_TYPE = "mock";
   static final int CONNECTOR_VERSION = 1;
+
+  private final RowTypeInfo schema;
+  private final List<Row> data;
 
   public MockExternalCatalogTable(RowTypeInfo schema, List<Row> data) {
     this.schema = schema;

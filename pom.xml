@@ -306,6 +306,20 @@
         <groupId>org.apache.flink</groupId>
         <artifactId>flink-shaded-hadoop2</artifactId>
         <version>${flink.shaded.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.thoughtworks.paranamer</groupId>
+            <artifactId>paranamer</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.tukaani</groupId>
+            <artifactId>xz</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.flink</groupId>
@@ -343,6 +357,12 @@
         <groupId>org.apache.kafka</groupId>
         <artifactId>kafka_${scala.binary.version}</artifactId>
         <version>${kafka.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.scala-lang.modules</groupId>
+            <artifactId>scala-xml_${scala.binary.version}</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
@@ -403,6 +423,21 @@
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
         <version>1.1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>com.thoughtworks.paranamer</groupId>
+        <artifactId>paranamer</artifactId>
+        <version>2.7</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+        <version>1.9.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.tukaani</groupId>
+        <artifactId>xz</artifactId>
+        <version>1.5</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

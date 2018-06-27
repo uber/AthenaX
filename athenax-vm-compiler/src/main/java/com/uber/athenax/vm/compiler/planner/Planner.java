@@ -21,7 +21,6 @@ package com.uber.athenax.vm.compiler.planner;
 import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
 import com.uber.athenax.vm.compiler.executor.CompilationResult;
 import com.uber.athenax.vm.compiler.executor.ContainedExecutor;
-import com.uber.athenax.vm.compiler.executor.JobCompiler;
 import com.uber.athenax.vm.compiler.executor.JobDescriptor;
 import com.uber.athenax.vm.compiler.parser.impl.ParseException;
 import com.uber.athenax.vm.compiler.parser.impl.SqlParserImpl;
@@ -55,7 +54,8 @@ public class Planner {
         outputs,
         parallelism,
         validator.statement().toString());
-    CompilationResult res = JobCompiler.compileJob(job); //new ContainedExecutor().run(job);
+    // uses contained executor instead of direct compile for: JobCompiler.compileJob(job);
+    CompilationResult res = new ContainedExecutor().run(job);
 
     if (res.remoteThrowable() != null) {
       throw res.remoteThrowable();
