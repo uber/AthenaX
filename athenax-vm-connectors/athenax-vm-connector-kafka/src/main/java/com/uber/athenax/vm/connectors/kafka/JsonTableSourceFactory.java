@@ -19,11 +19,9 @@
 package com.uber.athenax.vm.connectors.kafka;
 
 import org.apache.flink.table.api.TableSchema;
-import org.apache.flink.table.catalog.ExternalCatalogTable;
 import org.apache.flink.table.descriptors.ConnectorDescriptorValidator;
 import org.apache.flink.table.descriptors.DescriptorProperties;
 import org.apache.flink.table.sources.StreamTableSource;
-import org.apache.flink.table.sources.TableSource;
 import org.apache.flink.table.sources.TableSourceFactory;
 import org.apache.flink.types.Row;
 
@@ -57,6 +55,8 @@ public class JsonTableSourceFactory implements TableSourceFactory<Row> {
 
     // kafka
     properties.add(TOPIC_NAME_KEY);
+    properties.add(KAFKA_CONFIG_PREFIX + "." + "group.id");
+    properties.add(KAFKA_CONFIG_PREFIX + "." + "auto.offset.reset");
     properties.add(KAFKA_CONFIG_PREFIX + "." + "bootstrap.servers");
     properties.add(KAFKA_CONFIG_PREFIX + "." + "connector.topic");
     properties.add(KAFKA_CONFIG_PREFIX + "." + "connector.properties");
