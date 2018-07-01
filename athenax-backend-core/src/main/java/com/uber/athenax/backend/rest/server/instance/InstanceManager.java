@@ -26,12 +26,11 @@ import com.uber.athenax.backend.rest.api.InstanceState;
 import com.uber.athenax.backend.rest.api.InstanceStatus;
 import com.uber.athenax.backend.rest.api.JobDefinition;
 import com.uber.athenax.backend.rest.api.JobDefinitionDesiredState;
-import com.uber.athenax.vm.api.AthenaXTableCatalog;
-import com.uber.athenax.vm.api.AthenaXTableCatalogProvider;
+import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
+import com.uber.athenax.vm.api.tables.AthenaXTableCatalogProvider;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 import com.uber.athenax.vm.compiler.planner.Planner;
 import org.apache.flink.annotation.VisibleForTesting;
-import org.apache.flink.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

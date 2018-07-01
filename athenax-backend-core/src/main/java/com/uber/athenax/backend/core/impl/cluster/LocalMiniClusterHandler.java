@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.uber.athenax.backend.core.impl.cluster;
 
 import com.uber.athenax.backend.core.api.ClusterHandler;
@@ -31,6 +13,7 @@ import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.JobSubmissionResult;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,8 +53,8 @@ public class LocalMiniClusterHandler implements ClusterHandler, AutoCloseable {
     Map<String, ?> clusterExtra = conf.clusters().get(clusterName).getExtras();
     Configuration clusterConf = new Configuration();
     clusterConf.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
-    clusterConf.setInteger(ConfigConstants.JOB_MANAGER_WEB_PORT_KEY,
-        Integer.parseInt((String) clusterExtra.get(ConfigConstants.JOB_MANAGER_WEB_PORT_KEY)));
+    clusterConf.setInteger(RestOptions.PORT,
+        Integer.parseInt((String) clusterExtra.get(RestOptions.PORT.key())));
     try {
       miniCluster = new LocalFlinkMiniCluster(clusterConf);
       miniCluster.start();
@@ -90,7 +73,7 @@ public class LocalMiniClusterHandler implements ClusterHandler, AutoCloseable {
         throw new UnsupportedOperationException("Local cluster cannot submit with external Jars");
       }
       JobSubmissionResult submissionResult = miniCluster.submitJobDetached(compiledJob.jobGraph());
-      InstanceInfo instance = constructInstanceInfo(instanceMetadata, compiledJob, desiredState, submissionResult);
+      InstanceInfo instance = constructNewInstanceInfo(instanceMetadata, compiledJob, desiredState, submissionResult);
       this.instanceInfoMap.put(constructApplicationId(submissionResult.getJobID()), instance);
       return instance.status();
     } catch (Exception e) {
@@ -100,7 +83,16 @@ public class LocalMiniClusterHandler implements ClusterHandler, AutoCloseable {
 
   @Override
   public InstanceStatus terminateApplication(String applicationId) throws IOException {
-    return null;
+    try {
+      InstanceInfo instanceInfo = this.instanceInfoMap.get(applicationId);
+      miniCluster.stopJob(constructJobId(applicationId));
+      InstanceInfo instance = getUpdatedInstanceInfo(instanceInfo,
+          constructFinishedInstanceStatus(instanceInfo.clusterName(), instanceInfo.appId()));
+      instanceInfoMap.put(instanceInfo.appId(), instance);
+      return instance.status();
+    } catch (Exception e) {
+      throw wrapAsIOException(e);
+    }
   }
 
   @Override
@@ -143,17 +135,24 @@ public class LocalMiniClusterHandler implements ClusterHandler, AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    this.miniCluster.shutdown();
+    this.miniCluster.close();
   }
 
-  private static InstanceInfo constructInstanceInfo(
+  private static InstanceInfo constructNewInstanceInfo(
       InstanceMetadata metadata,
       JobCompilationResult compiledJob,
       JobDefinitionDesiredState desiredState,
       JobSubmissionResult submissionResult) {
-    return new InstanceInfo(desiredState.getClusterId(), submissionResult.getJobID().toString(),
+    return new InstanceInfo(desiredState.getClusterId(), constructApplicationId(submissionResult.getJobID()),
         metadata, constructRunningInstanceStatus(
-            desiredState.getClusterId(), submissionResult.getJobID().toString()));
+            desiredState.getClusterId(), constructApplicationId(submissionResult.getJobID())));
+  }
+
+  private static InstanceInfo getUpdatedInstanceInfo(
+      InstanceInfo instanceInfo,
+      InstanceStatus newStatus) {
+    return new InstanceInfo(instanceInfo.clusterName(), instanceInfo.appId(),
+        instanceInfo.metadata(), newStatus);
   }
 
   private static InstanceStatus constructFinishedInstanceStatus(String clusterId, String applicationId) {
@@ -170,12 +169,12 @@ public class LocalMiniClusterHandler implements ClusterHandler, AutoCloseable {
         .currentState(InstanceState.RUNNING);
   }
 
-  private JobID constructJobId(String applicationId) {
+  private static JobID constructJobId(String applicationId) {
     UUID uuid = UUID.fromString(applicationId);
-    return new JobID(uuid.getLeastSignificantBits(), uuid.getMostSignificantBits());
+    return new JobID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
   }
 
-  private String constructApplicationId(JobID jobId) {
-    return new UUID(jobId.getUpperPart(), jobId.getLowerPart()).toString();
+  private static String constructApplicationId(JobID jobId) {
+    return new UUID(jobId.getLowerPart(), jobId.getUpperPart()).toString();
   }
 }

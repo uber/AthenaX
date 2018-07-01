@@ -11,6 +11,7 @@ import com.uber.athenax.backend.rest.api.InstanceStatus;
 import com.uber.athenax.backend.rest.api.JobDefinitionDesiredState;
 import com.uber.athenax.backend.rest.api.JobDefinitionDesiredStateResource;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
+import org.apache.flink.configuration.RestOptions;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 import static org.apache.flink.configuration.ConfigConstants.JOB_MANAGER_WEB_PORT_KEY;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -40,8 +42,17 @@ public class LocalMiniClusterHandlerTest {
     LocalMiniClusterHandler handler = new LocalMiniClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
     handler.open(conf);
     InstanceStatus submissionStatus = handler.deployApplication(getMockMetadata(), getMockCompilation(), getMockJobDesiredState());
+    assertEquals(InstanceState.RUNNING, submissionStatus.getCurrentState());
+
     InstanceStatus checkStatus = handler.getApplicationStatus(submissionStatus.getApplicationId());
     assertEquals(InstanceState.RUNNING, checkStatus.getCurrentState());
+
+    try {
+      handler.terminateApplication(submissionStatus.getApplicationId());
+      fail();
+    } catch (IOException e) {
+      // expected;
+    }
   }
 
   private static InstanceMetadata getMockMetadata() {
@@ -65,7 +76,7 @@ public class LocalMiniClusterHandlerTest {
   private static AthenaXConfiguration getMockConfig() throws IOException {
     AthenaXConfiguration.ClusterConfig clusterConfig = mock(AthenaXConfiguration.ClusterConfig.class);
     doReturn(InMemoryJobStoreHandler.class.getName()).when(clusterConfig).getClusterHandlerClass();
-    doReturn(ImmutableMap.of(JOB_MANAGER_WEB_PORT_KEY, String.format("%d", new ServerSocket(0).getLocalPort())))
+    doReturn(ImmutableMap.of(RestOptions.PORT.key(), String.format("%d", new ServerSocket(0).getLocalPort())))
         .when(clusterConfig).getExtras();
     AthenaXConfiguration athenaxConf = mock(AthenaXConfiguration.class);
     doReturn(ImmutableMap.of("local_cluster", clusterConfig)).when(athenaxConf).clusters();

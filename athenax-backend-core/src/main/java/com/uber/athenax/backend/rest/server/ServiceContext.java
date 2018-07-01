@@ -29,7 +29,7 @@ import com.uber.athenax.backend.rest.api.JobDefinition;
 import com.uber.athenax.backend.rest.server.cluster.ClusterManager;
 import com.uber.athenax.backend.rest.server.instance.InstanceManager;
 import com.uber.athenax.backend.rest.server.job.JobManager;
-import com.uber.athenax.vm.api.AthenaXTableCatalogProvider;
+import com.uber.athenax.vm.api.tables.AthenaXTableCatalogProvider;
 
 import java.io.IOException;
 import java.util.List;

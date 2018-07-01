@@ -43,7 +43,7 @@ import static com.uber.athenax.backend.core.impl.CoreUtils.isActiveState;
 
 /**
  * This is a basic implementation of the instance handler
- * It performs passive state update on API call.
+ * It performs passive state update on API call, it does not maintain any state internally.
  */
 public class DirectDeployInstanceHandler implements InstanceHandler {
   private static final Logger LOG = LoggerFactory.getLogger(DirectDeployInstanceHandler.class);
