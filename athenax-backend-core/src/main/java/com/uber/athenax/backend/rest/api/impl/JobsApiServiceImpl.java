@@ -18,20 +18,20 @@
 
 package com.uber.athenax.backend.rest.api.impl;
 
-import com.uber.athenax.backend.rest.api.*;
 import com.uber.athenax.backend.rest.api.JobDefinition;
+import com.uber.athenax.backend.rest.api.JobsApiService;
 import com.uber.athenax.backend.rest.api.NotFoundException;
 import com.uber.athenax.backend.rest.server.ServiceContext;
-
-import java.io.IOException;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import java.util.UUID;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
+@javax.annotation.Generated(
+    value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
 public class JobsApiServiceImpl extends JobsApiService {
   private final ServiceContext ctx;
 
@@ -41,7 +41,13 @@ public class JobsApiServiceImpl extends JobsApiService {
 
   @Override
   public Response createJob(SecurityContext securityContext) throws NotFoundException {
-    return null;
+    try {
+      JobDefinition job = ctx.createJob();
+      return Response.ok(job).build();
+    } catch (IOException e) {
+      throw new NotFoundException(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage());
+    }
+
   }
 
   @Override
@@ -54,7 +60,7 @@ public class JobsApiServiceImpl extends JobsApiService {
         return Response.ok(job).build();
       }
     } catch (IOException e) {
-      throw new NotFoundException(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
+      throw new NotFoundException(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage());
     }
   }
 
@@ -64,7 +70,7 @@ public class JobsApiServiceImpl extends JobsApiService {
       List<JobDefinition> jobList = ctx.listJob();
       return Response.ok(jobList).build();
     } catch (IOException e) {
-      throw new NotFoundException(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
+      throw new NotFoundException(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage());
     }
   }
 
@@ -73,7 +79,7 @@ public class JobsApiServiceImpl extends JobsApiService {
     try {
       ctx.removeJob(jobUUID);
     } catch (IOException e) {
-      throw new NotFoundException(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
+      throw new NotFoundException(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage());
     }
     return Response.ok().build();
   }
@@ -86,7 +92,7 @@ public class JobsApiServiceImpl extends JobsApiService {
     try {
       ctx.updateJob(jobUUID, body);
     } catch (IOException e) {
-      throw new NotFoundException(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
+      throw new NotFoundException(Response.Status.NOT_FOUND.getStatusCode(), e.getMessage());
     }
     return Response.ok().build();
   }

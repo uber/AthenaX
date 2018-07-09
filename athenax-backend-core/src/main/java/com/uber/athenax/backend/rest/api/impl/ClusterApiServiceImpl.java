@@ -18,14 +18,15 @@
 
 package com.uber.athenax.backend.rest.api.impl;
 
-import com.uber.athenax.backend.rest.api.*;
+import com.uber.athenax.backend.rest.api.ClusterApiService;
 import com.uber.athenax.backend.rest.api.ClusterInfo;
 import com.uber.athenax.backend.rest.api.NotFoundException;
 import com.uber.athenax.backend.rest.server.ServiceContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
+@javax.annotation.Generated(
+    value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
 public class ClusterApiServiceImpl extends ClusterApiService {
   private final ServiceContext ctx;
 

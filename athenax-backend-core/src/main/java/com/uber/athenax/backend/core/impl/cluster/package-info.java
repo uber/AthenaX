@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.uber.athenax.backend.rest.server.job;
-
-public class JobManagerTest {
-}
+/**
+ * Implementations for {@link com.uber.athenax.backend.core.api.ClusterHandler}.
+ */
+package com.uber.athenax.backend.core.impl.cluster;

@@ -33,7 +33,6 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 public class InMemoryJobStoreHandlerTest {
@@ -42,14 +41,16 @@ public class InMemoryJobStoreHandlerTest {
   public void testInMemoryStoreOperation() throws IOException {
     AthenaXConfiguration conf = mock(AthenaXConfiguration.class);
 
-    // Insert Job
-    UUID jobUUID = UUID.randomUUID();
-    JobDefinition def = new JobDefinition()
-        .query("foo");
+    // Open connection
     InMemoryJobStoreHandler handler = new InMemoryJobStoreHandler();
     handler.open(conf);
     assertTrue(handler.listAllJobs(null).isEmpty());
     assertTrue(handler.listAllInstances(null).isEmpty());
+
+    // Insert job
+    JobDefinition def = new JobDefinition()
+        .query("foo");
+    UUID jobUUID = UUID.randomUUID();
     handler.updateJob(jobUUID, def);
     assertEquals(def.getQuery(), handler.getJob(jobUUID).getQuery());
     assertEquals(1, handler.listAllJobs(null).size());

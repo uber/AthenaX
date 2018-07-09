@@ -76,9 +76,11 @@ public final class ServiceContext {
             return (ClusterHandler) null;
           }
         }));
+    Boolean instanceUpdateOnApiRequest = Boolean.valueOf((String) conf.extras().get("instance.update.trigger.on.api"));
     this.clusterManager = new ClusterManager(clusterHandlerMap);
-    this.instanceManager = new InstanceManager(jobStoreHandler, instanceHandler, catalogProvider);
-    this.jobManager = new JobManager(jobStoreHandler, instanceManager);
+    this.instanceManager = new InstanceManager(jobStoreHandler, instanceHandler, catalogProvider,
+        instanceUpdateOnApiRequest);
+    this.jobManager = new JobManager(jobStoreHandler, instanceManager, instanceUpdateOnApiRequest);
   }
 
   public void start() throws IOException {
@@ -94,10 +96,6 @@ public final class ServiceContext {
 
   public ClusterInfo getClusterInfo() {
     return null;
-  }
-
-  public InstanceStatus updateJobInstance(UUID instanceUUID, InstanceState state) {
-    return instanceManager.changeInstanceState(instanceUUID, state);
   }
 
   public InstanceStatus getJobInstanceStatus(UUID instanceUUID) {

@@ -18,9 +18,9 @@
 
 package com.uber.athenax.backend.rest.api.impl;
 
-import com.uber.athenax.backend.rest.api.*;
 import com.uber.athenax.backend.rest.api.InstanceState;
 import com.uber.athenax.backend.rest.api.InstanceStatus;
+import com.uber.athenax.backend.rest.api.InstancesApiService;
 import com.uber.athenax.backend.rest.api.NotFoundException;
 import com.uber.athenax.backend.rest.server.ServiceContext;
 
@@ -29,26 +29,13 @@ import javax.ws.rs.core.SecurityContext;
 
 import java.util.UUID;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
+@javax.annotation.Generated(
+    value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
 public class InstancesApiServiceImpl extends InstancesApiService {
   private final ServiceContext ctx;
 
   public InstancesApiServiceImpl(ServiceContext ctx) {
     this.ctx = ctx;
-  }
-
-  @Override
-  public Response changeInstanceState(
-      UUID instanceUUID,
-      InstanceState state,
-      SecurityContext securityContext) throws NotFoundException {
-    try {
-      ctx.updateJobInstance(instanceUUID, state);
-      return Response.ok().build();
-    } catch (Exception e) {
-      return Response.serverError().entity("Exception when updating job instance: "
-          + instanceUUID + " with state: " + state + ", cause: " + e).build();
-    }
   }
 
   @Override

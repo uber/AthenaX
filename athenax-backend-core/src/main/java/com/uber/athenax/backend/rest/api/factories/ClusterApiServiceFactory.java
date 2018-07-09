@@ -22,15 +22,12 @@ import com.uber.athenax.backend.rest.api.ClusterApiService;
 import com.uber.athenax.backend.rest.api.impl.ClusterApiServiceImpl;
 import com.uber.athenax.backend.rest.server.ServiceContext;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
-public class ClusterApiServiceFactory {
-  private final static ClusterApiService SERVICE = new ClusterApiServiceImpl(ServiceContext.getInstance());
+@javax.annotation.Generated(
+    value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
+public final class ClusterApiServiceFactory {
+  private static final ClusterApiService SERVICE = new ClusterApiServiceImpl(ServiceContext.getInstance());
 
   private ClusterApiServiceFactory() {
-  }
-
-  public static void initialize() {
-
   }
 
   public static ClusterApiService getClusterApi() {

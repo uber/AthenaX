@@ -30,9 +30,12 @@ import static com.uber.athenax.backend.rest.api.InstanceState.RUNNING;
 import static com.uber.athenax.backend.rest.api.InstanceState.SUBMITTED;
 
 public final class CoreUtils {
-
   private static final EnumSet<InstanceState> ACTIVE_STATE =
       EnumSet.of(NEW, NEW_SAVING, SUBMITTED, ACCEPTED, RUNNING);
+
+  private CoreUtils() {
+
+  }
 
   public static boolean isActiveState(InstanceState state) {
     return ACTIVE_STATE.contains(state);

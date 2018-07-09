@@ -20,10 +20,8 @@ package com.uber.athenax.backend.core.api;
 
 import com.uber.athenax.backend.core.entities.AthenaXConfiguration;
 import com.uber.athenax.backend.core.impl.instance.InstanceInfo;
-import com.uber.athenax.backend.rest.api.InstanceState;
 import com.uber.athenax.backend.rest.api.InstanceStatus;
 import com.uber.athenax.backend.rest.api.JobDefinition;
-import com.uber.athenax.backend.rest.api.JobDefinitionDesiredState;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 
 import java.io.IOException;
@@ -35,19 +33,21 @@ import java.util.UUID;
  * Defines the APIs used to perform lifecycle management of an instance based on a specific
  * {@link JobDefinition}.
  *
+ * <p>
  * This converts the job definition, along with the {@link JobCompilationResult} into a deployable
- * component based on the {@link JobDefinitionDesiredState}.
+ * component based on the {@link com.uber.athenax.backend.rest.api.JobDefinitionDesiredState}.
  *
  * An instance is one-to-one mapped to a specific application on a cluster. The actual deployment
  * to computation cluster will be invoke via the {@link ClusterHandler} APIs.
+ * </p>
  */
 public interface InstanceHandler {
 
   /**
    * Open or start the {@link InstanceHandler} implementation.
    * AthenaX guarantees to call during {@link com.uber.athenax.backend.rest.server.ServiceContext} startup.
-   * @param conf
-   * @throws IOException
+   * @param conf configuration
+   * @throws IOException when open connection to instance handler fails.
    */
   void open(AthenaXConfiguration conf) throws IOException;
 
@@ -58,10 +58,10 @@ public interface InstanceHandler {
    * to be provided by the AthenaX {@link com.uber.athenax.backend.rest.server.ServiceContext}.
    * </p>
    *
-   * @param jobDefinition
-   * @param compilationResult
-   * @return
-   * @throws IOException
+   * @param jobDefinition definition of the job
+   * @param compilationResult compilation result of a specific job
+   * @return instance information if any updated instance is generated, null otherwise
+   * @throws IOException when update job instance fails.
    */
   InstanceInfo onJobUpdate(
       JobDefinition jobDefinition,
@@ -74,33 +74,25 @@ public interface InstanceHandler {
    * callback. Status update triggered by instance handler should not call this method.
    * </p>
    *
-   * @param status
-   * @return
-   * @throws IOException
+   * @param status newly acquired state from cluster.
+   * @return instance information if any new changes.
+   * @throws IOException when connection to instance handler fails.
    */
   InstanceInfo onStatusUpdate(InstanceStatus status) throws IOException;
 
   /**
    * Acquire {@link InstanceInfo} by UUID.
-   * @param uuid
-   * @return
-   * @throws IOException
+   * @param uuid identifier of the specific instance
+   * @return information of the instance
+   * @throws IOException when connection to instance handler fails.
    */
   InstanceInfo getInstanceInfo(UUID uuid) throws IOException;
 
   /**
-   * Update an instance to a new {@link InstanceState}
-   * @param uuid
-   * @param state
-   * @throws IOException
-   */
-  InstanceStatus updateInstanceState(UUID uuid, InstanceState state) throws IOException;
-
-  /**
-   * List all active instances with their {@link InstanceInfo}s
-   * @param prop
-   * @return
-   * @throws IOException
+   * List all active instances with their {@link InstanceInfo}s.
+   * @param prop search properties map
+   * @return list of instance information
+   * @throws IOException when connection to instance handler fails.
    */
   List<InstanceInfo> scanAllInstance(Properties prop) throws IOException;
 }

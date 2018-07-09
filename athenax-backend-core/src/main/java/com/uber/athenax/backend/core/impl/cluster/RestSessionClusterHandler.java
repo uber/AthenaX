@@ -27,14 +27,20 @@ import com.uber.athenax.backend.rest.api.InstanceState;
 import com.uber.athenax.backend.rest.api.InstanceStatus;
 import com.uber.athenax.backend.rest.api.JobDefinitionDesiredState;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.time.Time;
-import org.apache.flink.client.program.rest.RestClusterClientConfiguration;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.runtime.entrypoint.StandaloneSessionClusterEntrypoint;
+import org.apache.flink.runtime.messages.webmonitor.MultipleJobsDetails;
 import org.apache.flink.runtime.rest.RestClient;
 import org.apache.flink.runtime.rest.RestClientConfiguration;
 import org.apache.flink.runtime.rest.messages.EmptyMessageParameters;
-import org.apache.flink.runtime.rest.messages.MessageHeaders;
+import org.apache.flink.runtime.rest.messages.EmptyRequestBody;
+import org.apache.flink.runtime.rest.messages.JobMessageParameters;
+import org.apache.flink.runtime.rest.messages.JobTerminationHeaders;
+import org.apache.flink.runtime.rest.messages.JobTerminationMessageParameters;
+import org.apache.flink.runtime.rest.messages.JobsOverviewHeaders;
+import org.apache.flink.runtime.rest.messages.job.JobDetailsHeaders;
+import org.apache.flink.runtime.rest.messages.job.JobDetailsInfo;
 import org.apache.flink.runtime.rest.messages.job.JobSubmitHeaders;
 import org.apache.flink.runtime.rest.messages.job.JobSubmitRequestBody;
 import org.apache.flink.runtime.rest.messages.job.JobSubmitResponseBody;
@@ -43,19 +49,19 @@ import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 import static com.uber.athenax.backend.core.impl.CoreUtils.wrapAsIOException;
+import static com.uber.athenax.backend.core.impl.cluster.util.FlinkSessionClusterUtil.constructApplicationIdFromJobId;
+import static com.uber.athenax.backend.core.impl.cluster.util.FlinkSessionClusterUtil.constructInstanceStatus;
+import static com.uber.athenax.backend.core.impl.cluster.util.FlinkSessionClusterUtil.parseJobStatus;
 
 /**
  * Example a REST-based session cluster implementation of the cluster handler.
@@ -63,6 +69,7 @@ import static com.uber.athenax.backend.core.impl.CoreUtils.wrapAsIOException;
  */
 public class RestSessionClusterHandler implements ClusterHandler, AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(RestSessionClusterHandler.class);
+  private static final int UUID_STRING_LENGTH = 32;
 
   private final Executor executor = new ScheduledThreadPoolExecutor(1);
   private final String clusterName;
@@ -92,9 +99,14 @@ public class RestSessionClusterHandler implements ClusterHandler, AutoCloseable 
       InstanceMetadata instanceMetadata,
       JobCompilationResult compiledJob,
       JobDefinitionDesiredState desiredState) throws IOException {
-    CompletableFuture<JobSubmitResponseBody> future = restClient.sendRequest(host, port, JobSubmitHeaders.getInstance(), EmptyMessageParameters.getInstance(),
-        new JobSubmitRequestBody(compiledJob.jobGraph()));
+    if (compiledJob.additionalJars().size() > 0) {
+      throw new IllegalArgumentException("RestSessionClusterHandler cannot handle additional jars!");
+    }
     try {
+      CompletableFuture<JobSubmitResponseBody> future = restClient.sendRequest(host, port,
+          JobSubmitHeaders.getInstance(),
+          EmptyMessageParameters.getInstance(),
+          new JobSubmitRequestBody(compiledJob.jobGraph()));
       JobSubmitResponseBody jobSubmitResponseBody = future.get();
       return new InstanceStatus()
           .clusterId(this.clusterName)
@@ -110,22 +122,61 @@ public class RestSessionClusterHandler implements ClusterHandler, AutoCloseable 
 
   @Override
   public InstanceStatus terminateApplication(String applicationId) throws IOException {
-    return null;
+    JobTerminationHeaders headers = JobTerminationHeaders.getInstance();
+    JobTerminationMessageParameters messageParams = headers.getUnresolvedMessageParameters();
+    messageParams.jobPathParameter.resolve(constructJobIdFromAppId(applicationId));
+    try {
+      restClient.sendRequest(host, port, headers,
+          messageParams,
+          EmptyRequestBody.getInstance());
+      return null;
+    } catch (Exception e) {
+      throw wrapAsIOException(e);
+    }
   }
 
   @Override
   public InstanceStatus getApplicationStatus(String applicationId) throws IOException {
-    return null;
+    JobID jobId = constructJobIdFromAppId(applicationId);
+    JobDetailsHeaders headers = JobDetailsHeaders.getInstance();
+    JobMessageParameters messageParams = headers.getUnresolvedMessageParameters();
+    messageParams.jobPathParameter.resolve(constructJobIdFromAppId(applicationId));
+    try {
+      CompletableFuture<JobDetailsInfo> future = restClient.sendRequest(host, port, headers,
+          messageParams,
+          EmptyRequestBody.getInstance());
+      JobDetailsInfo jobDetailsInfo = future.get();
+      return constructInstanceStatus(this.clusterName, applicationId, parseJobStatus(jobDetailsInfo.getJobStatus()));
+    } catch (Exception e) {
+      throw wrapAsIOException(e);
+    }
   }
 
   @Override
   public List<InstanceStatus> listAllApplications(Properties props) throws IOException {
-    return null;
+    // search props are ignored
+    JobsOverviewHeaders headers = JobsOverviewHeaders.getInstance();
+    try {
+      CompletableFuture<MultipleJobsDetails> future = restClient.sendRequest(host, port, headers,
+          EmptyMessageParameters.getInstance(),
+          EmptyRequestBody.getInstance());
+      MultipleJobsDetails jobsDetails = future.get();
+      return jobsDetails.getJobs().stream().map(job ->
+        constructInstanceStatus(this.clusterName,
+            constructApplicationIdFromJobId(job.getJobId()),
+            parseJobStatus(job.getStatus()))).collect(Collectors.toList());
+    } catch (Exception e) {
+      throw wrapAsIOException(e);
+    }
   }
 
   @Override
   public InstanceInfo parseInstanceStatus(InstanceStatus status) throws IllegalArgumentException {
-    return null;
+    // TODO Fix me, the concept of InstanceInfo and InstanceStatus is confusing
+    return new InstanceInfo(this.clusterName,
+        status.getApplicationId(),
+        new InstanceMetadata(),
+        status);
   }
 
   @Override
@@ -134,6 +185,10 @@ public class RestSessionClusterHandler implements ClusterHandler, AutoCloseable 
   }
 
   private String parseAppIdFromJobUrl(String jobUrl) {
-    return jobUrl;
+    return jobUrl.substring(jobUrl.length() - UUID_STRING_LENGTH);
+  }
+
+  private JobID constructJobIdFromAppId(String appId) {
+    return JobID.fromHexString(appId);
   }
 }

@@ -29,13 +29,9 @@ import com.uber.athenax.backend.rest.api.InstanceStatus;
 import com.uber.athenax.backend.rest.api.JobDefinitionDesiredState;
 import com.uber.athenax.backend.rest.api.JobDefinitionDesiredStateResource;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
-import org.apache.flink.configuration.ConfigConstants;
-import org.apache.flink.configuration.RestOptions;
-import org.apache.flink.configuration.TaskManagerOptions;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -44,13 +40,13 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-public class LocalMiniClusterHandlerTest {
+public class RestSessionClusterHandlerTest {
   private static final String CLUSTER_NAME = "local_cluster";
 
   @Test
   public void testStartUp() throws Exception {
     AthenaXConfiguration conf = getMockConfig();
-    LocalMiniClusterHandler handler = new LocalMiniClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
+    RestSessionClusterHandler handler = new RestSessionClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
     handler.open(conf);
     assertEquals(0, handler.listAllApplications(null).size());
     handler.close();
@@ -59,7 +55,7 @@ public class LocalMiniClusterHandlerTest {
   @Test
   public void testDeployJobAndCheckStatus() throws Exception {
     AthenaXConfiguration conf = getMockConfig();
-    LocalMiniClusterHandler handler = new LocalMiniClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
+    RestSessionClusterHandler handler = new RestSessionClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
     handler.open(conf);
     InstanceStatus submissionStatus =
         handler.deployApplication(getMockMetadata(), getMockCompilation(), getMockJobDesiredState());
@@ -96,14 +92,8 @@ public class LocalMiniClusterHandlerTest {
 
   private static AthenaXConfiguration getMockConfig() throws IOException {
     AthenaXConfiguration.ClusterConfig clusterConfig = mock(AthenaXConfiguration.ClusterConfig.class);
-    String port = String.valueOf(new ServerSocket(0).getLocalPort());
     doReturn(InMemoryJobStoreHandler.class.getName()).when(clusterConfig).getClusterHandlerClass();
-    doReturn(ImmutableMap.of(
-        RestOptions.PORT.key(), port,
-        "flink.cluster.host", "localhost",
-        "flink.cluster.port", port,
-        ConfigConstants.LOCAL_NUMBER_TASK_MANAGER, "1",
-        TaskManagerOptions.NUM_TASK_SLOTS.key(), "1"))
+    doReturn(ImmutableMap.of("flink.cluster.host", "localhost", "flink.cluster.port", "8081"))
         .when(clusterConfig).getExtras();
     AthenaXConfiguration athenaxConf = mock(AthenaXConfiguration.class);
     doReturn(ImmutableMap.of("local_cluster", clusterConfig)).when(athenaxConf).clusters();

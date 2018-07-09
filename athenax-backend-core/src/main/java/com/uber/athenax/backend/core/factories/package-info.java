@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.uber.athenax.backend.rest.server.job;
-
-public class JobManagerTest {
-}
+/**
+ * Factories methods to create handler implementations.
+ */
+package com.uber.athenax.backend.core.factories;

@@ -41,12 +41,16 @@ public class JobManager {
   private static final Logger LOG = LoggerFactory.getLogger(JobManager.class);
   private final JobStoreHandler jobStore;
   private final InstanceManager instanceManager;
+  private final boolean instanceUpdateOnApiRequest;
 
   @VisibleForTesting
-  public JobManager(JobStoreHandler jobStore,
-             InstanceManager instanceManager) {
+  public JobManager(
+      JobStoreHandler jobStore,
+      InstanceManager instanceManager,
+      boolean instanceUpdateOnApiRequest) {
     this.jobStore = jobStore;
     this.instanceManager = instanceManager;
+    this.instanceUpdateOnApiRequest = instanceUpdateOnApiRequest;
   }
 
   public UUID newJobUUID() {
@@ -65,7 +69,9 @@ public class JobManager {
   public void updateJob(UUID uuid, JobDefinition definition) {
     try {
       jobStore.updateJob(uuid, definition);
-      instanceManager.instanceUpdateOnJobUpdate(definition);
+      if (instanceUpdateOnApiRequest) {
+        instanceManager.instanceUpdateOnJobUpdate(definition);
+      }
     } catch (IOException e) {
       LOG.error("Unable to update job definition: " + uuid + " with: " + definition);
     }

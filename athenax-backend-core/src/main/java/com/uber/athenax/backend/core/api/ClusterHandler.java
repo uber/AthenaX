@@ -22,7 +22,6 @@ import com.uber.athenax.backend.core.entities.AthenaXConfiguration;
 import com.uber.athenax.backend.core.impl.instance.InstanceInfo;
 import com.uber.athenax.backend.core.impl.instance.InstanceMetadata;
 import com.uber.athenax.backend.rest.api.InstanceStatus;
-import com.uber.athenax.backend.rest.api.JobDefinition;
 import com.uber.athenax.backend.rest.api.JobDefinitionDesiredState;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 
@@ -53,17 +52,17 @@ public interface ClusterHandler {
   /**
    * Open connection to the {@link InstanceHandler} implementation.
    * AthenaX guarantees to call during {@link com.uber.athenax.backend.rest.server.ServiceContext} startup.
-   * @param conf
-   * @throws IOException
+   * @param conf configuration
+   * @throws IOException when opening connection to cluster fails.
    */
   void open(AthenaXConfiguration conf) throws IOException;
 
   /**
    * Create an actual Flink application on this cluster.
-   * @param instanceMetadata
-   * @param compiledJob
-   * @param desiredState
-   * @return
+   * @param instanceMetadata metadata of an instance
+   * @param compiledJob compilation result from a job
+   * @param desiredState desired instance state
+   * @return new instance status after deployment
    */
   InstanceStatus deployApplication(
       InstanceMetadata instanceMetadata,
@@ -72,22 +71,22 @@ public interface ClusterHandler {
 
   /**
    * Kill an actual Flink application on this cluster based on the cluster-specific application ID.
-   * @param applicationId
-   * @return
+   * @param applicationId the AppId of the application to be terminated
+   * @return new status after termination operation is done.
    */
   InstanceStatus terminateApplication(String applicationId) throws IOException;
 
   /**
    * Acquire latest application state by the application ID.
-   * @param applicationId
-   * @return
+   * @param applicationId the AppId of the application.
+   * @return latest status of the application.
    */
   InstanceStatus getApplicationStatus(String applicationId) throws IOException;
 
   /**
    * Scan and list all applications on this cluster.
-   * @param props
-   * @return
+   * @param props search properties map
+   * @return list of instance status
    */
   List<InstanceStatus> listAllApplications(Properties props) throws IOException;
 
@@ -95,8 +94,8 @@ public interface ClusterHandler {
    * Parse an {@link InstanceStatus} constructed by this specific cluster handler into an
    * {@link InstanceInfo} object.
    *
-   * @param status
-   * @return
+   * @param status instance status in cluster format
+   * @return reconstructed instance information based on the instance status (serialized form).
    */
   InstanceInfo parseInstanceStatus(InstanceStatus status);
 }

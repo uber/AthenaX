@@ -55,7 +55,7 @@ public class AthenaXConfiguration {
 
   // Extra configurations that can be used to customize the system.
   @JsonProperty("extras")
-  private final Map<String, ?> extras;
+  private final Map<String, ? extends Object> extras;
 
   public AthenaXConfiguration() {
     this.masterUri = null;

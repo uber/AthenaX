@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.uber.athenax.backend.rest.server.job;
-
-public class JobManagerTest {
-}
+/**
+ * Core handler APIs for Athenax backend.
+ */
+package com.uber.athenax.backend.core.api;

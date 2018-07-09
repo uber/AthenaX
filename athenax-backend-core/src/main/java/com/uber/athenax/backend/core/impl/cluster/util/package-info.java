@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.uber.athenax.backend.rest.server.job;
-
-public class JobManagerTest {
-}
+/**
+ * Utilities for all cluster handler that directly deal with Flink Cluster.
+ */
+package com.uber.athenax.backend.core.impl.cluster.util;

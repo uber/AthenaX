@@ -22,9 +22,10 @@ import com.uber.athenax.backend.rest.api.JobsApiService;
 import com.uber.athenax.backend.rest.api.impl.JobsApiServiceImpl;
 import com.uber.athenax.backend.rest.server.ServiceContext;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
-public class JobsApiServiceFactory {
-  private final static JobsApiService SERVICE = new JobsApiServiceImpl(ServiceContext.getInstance());
+@javax.annotation.Generated(
+    value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2018-06-09T10:41:28.649-07:00")
+public final class JobsApiServiceFactory {
+  private static final JobsApiService SERVICE = new JobsApiServiceImpl(ServiceContext.getInstance());
 
   private JobsApiServiceFactory() {
   }

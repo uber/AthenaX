@@ -16,7 +16,21 @@
  * limitations under the License.
  */
 
-package com.uber.athenax.backend.rest.server.job;
+package com.uber.athenax.backend.core.impl;
 
-public class JobManagerTest {
+import org.apache.flink.runtime.jobgraph.JobGraph;
+import org.apache.flink.runtime.jobgraph.JobVertex;
+import org.apache.flink.runtime.operators.testutils.DummyInvokable;
+
+public final class Utils {
+  private Utils() {
+  }
+
+  public static JobGraph trivialJobGraph() {
+    JobGraph g = new JobGraph();
+    JobVertex v = new JobVertex("1");
+    v.setInvokableClass(DummyInvokable.class);
+    g.addVertex(v);
+    return g;
+  }
 }

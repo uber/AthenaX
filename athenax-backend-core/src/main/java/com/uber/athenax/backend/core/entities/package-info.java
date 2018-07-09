@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.uber.athenax.backend.rest.server.job;
-
-public class JobManagerTest {
-}
+/**
+ * Global entities used by all AthenaX systems & handlers.
+ */
+package com.uber.athenax.backend.core.entities;

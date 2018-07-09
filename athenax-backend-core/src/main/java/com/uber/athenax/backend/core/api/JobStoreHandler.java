@@ -28,39 +28,39 @@ import java.util.Properties;
 import java.util.UUID;
 
 /**
- * Defines interface for an external {@link JobStoreHandler} that handles persistent storage
- * for information on {@link JobDefinition} and {@link InstanceInfo}
+ * Defines interface for an external {@link JobStoreHandler} that handles persistent storage.
+ * It is for information on {@link JobDefinition} and {@link InstanceInfo}
  */
 public interface JobStoreHandler {
 
   /**
    * Open connection to the {@link JobStoreHandler} implementation.
    * AthenaX guarantees to call during {@link com.uber.athenax.backend.rest.server.ServiceContext} startup.
-   * @param conf
-   * @throws IOException
+   * @param conf configuration
+   * @throws IOException when opening connection to job store fails.
    */
   void open(AthenaXConfiguration conf) throws IOException;
 
   /**
    * Acquire {@link JobDefinition} by job UUID.
-   * @param uuid
-   * @return
-   * @throws IOException
+   * @param uuid id of the job
+   * @return definition of a job
+   * @throws IOException connection with job store fails.
    */
   JobDefinition getJob(UUID uuid) throws IOException;
 
   /**
-   * Update a job with new {@link JobDefinition}
-   * @param uuid
-   * @param job
-   * @throws IOException
+   * Update a job with new {@link JobDefinition}.
+   * @param uuid id of the job
+   * @param job definition of a job
+   * @throws IOException connection with job store fails.
    */
   void updateJob(UUID uuid, JobDefinition job) throws IOException;
 
   /**
    * Remove a job from the job store.
-   * @param uuid
-   * @throws IOException
+   * @param uuid id of the job
+   * @throws IOException connection with job store fails.
    */
   void removeJob(UUID uuid) throws IOException;
 
@@ -68,41 +68,40 @@ public interface JobStoreHandler {
    * List all existing {@link JobDefinition}s.
    * @param props optional search properties for filtering list all
    *
-   * @return
-   * @throws IOException
+   * @return list of job definitions
+   * @throws IOException connection with job store fails.
    * @throws UnsupportedOperationException if search {@param props} is not supported.
    */
   List<JobDefinition> listAllJobs(Properties props) throws IOException, UnsupportedOperationException;
 
   /**
    * Acquire {@link InstanceInfo} by instance UUID.
-   * @param uuid
-   * @return
-   * @throws IOException
+   * @param uuid id of the instance.
+   * @return instance information stored in database.
+   * @throws IOException connection with job store fails.
    */
   InstanceInfo getInstance(UUID uuid) throws IOException;
 
   /**
    * Insert an {@link InstanceInfo} by instance UUID.
-   * @param uuid
-   * @param info
-   * @return
-   * @throws IOException
+   * @param uuid id of the instance
+   * @param info information of the instance
+   * @throws IOException connection with job store fails.
    */
   void insertInstance(UUID uuid, InstanceInfo info) throws IOException;
 
   /**
    * Remove an instance record from the instance store.
-   * @param uuid
-   * @throws IOException
+   * @param uuid id of the instance
+   * @throws IOException connection with job store fails.
    */
   void removeInstance(UUID uuid) throws IOException;
 
   /**
    * List all existing {@link InstanceInfo}s.
    * @param props optional search properties for filtering list all
-   * @return
-   * @throws IOException
+   * @return list of instances stored in database.
+   * @throws IOException connection with job store fails.
    * @throws UnsupportedOperationException if search {@param props} is not supported.
    */
   List<InstanceInfo> listAllInstances(Properties props) throws IOException, UnsupportedOperationException;

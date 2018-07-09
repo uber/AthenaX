@@ -22,11 +22,9 @@ import com.uber.athenax.backend.core.api.ClusterHandler;
 import com.uber.athenax.backend.core.api.InstanceHandler;
 import com.uber.athenax.backend.core.api.JobStoreHandler;
 import com.uber.athenax.backend.core.entities.AthenaXConfiguration;
-import com.uber.athenax.backend.rest.api.InstanceState;
 import com.uber.athenax.backend.rest.api.InstanceStatus;
 import com.uber.athenax.backend.rest.api.JobDefinition;
 import com.uber.athenax.backend.rest.api.JobDefinitionDesiredState;
-import com.uber.athenax.backend.rest.api.JobDefinitionDesiredStateResource;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 import org.apache.flink.annotation.VisibleForTesting;
 import org.slf4j.Logger;
@@ -62,38 +60,22 @@ public class DirectDeployInstanceHandler implements InstanceHandler {
 
   }
 
-  /**
-   * Main logic to initialize a new instance when {@link JobDefinition} was first
-   * invoked, with which no previous instance was associated.
-   *
-   * @param jobDefinition
-   * @param compilationResult
-   * @return
-   * @throws IOException
-   */
-  @VisibleForTesting
-  InstanceInfo initializeInstance(
+  @Override
+  public InstanceInfo onJobUpdate(
       JobDefinition jobDefinition,
       JobCompilationResult compilationResult) throws IOException {
-    UUID jobUuid = jobDefinition.getUuid();
-    JobDefinitionDesiredState desiredState = jobDefinition.getDesiredState();
-    String clusterId = desiredState.getClusterId();
-    ClusterHandler handler = this.clusters.get(clusterId);
-    if (handler == null) {
-      throw new IllegalStateException("Cannot find application cluster handler for "
-          + "cluster:" + clusterId + " please change your configuration!");
-    }
+    return null;
+  }
 
-    // Create a new instance using the application handler.
-    UUID instanceUUID = UUID.randomUUID();
-    InstanceMetadata metadata = new InstanceMetadata(instanceUUID, jobUuid, jobDefinition.getTag().toString());
-    InstanceInfo instance = null;
+  @Override
+  public InstanceInfo onStatusUpdate(InstanceStatus status) throws IOException {
+    throw new UnsupportedOperationException(
+        "Direct deployment instance handler does not support on application status update actor!");
+  }
 
-    InstanceStatus status = handler.deployApplication(metadata, compilationResult, desiredState);
-    instance = new InstanceInfo(clusterId, status.getApplicationId(), metadata, status);
-
-    jobStoreHandler.insertInstance(instanceUUID, instance);
-    return instance;
+  @Override
+  public InstanceInfo getInstanceInfo(UUID uuid) throws IOException {
+    return jobStoreHandler.getInstance(uuid);
   }
 
   /**
@@ -105,9 +87,9 @@ public class DirectDeployInstanceHandler implements InstanceHandler {
    * Supported operation(s) is solely depended on how the underlying cluster/application handler
    * was implemented. </p>
    *
-   * @param instance
-   * @param desiredState
-   * @throws IOException
+   * @param instance the instance information for which changes is requested
+   * @param desiredState desired instance state
+   * @throws IOException when update fails.
    */
   @VisibleForTesting
   InstanceStatus updateInstanceState(
@@ -145,42 +127,6 @@ public class DirectDeployInstanceHandler implements InstanceHandler {
   }
 
   @Override
-  public InstanceInfo onJobUpdate(
-      JobDefinition jobDefinition,
-      JobCompilationResult compilationResult) throws IOException {
-    return null;
-  }
-
-  @Override
-  public InstanceInfo onStatusUpdate(InstanceStatus status) throws IOException {
-    throw new UnsupportedOperationException("Direct deployment instance handler does not support reverse status "
-        + "update actor!");
-  }
-
-  @Override
-  public InstanceInfo getInstanceInfo(UUID uuid) throws IOException {
-    return jobStoreHandler.getInstance(uuid);
-  }
-
-  @Override
-  public InstanceStatus updateInstanceState(UUID uuid, InstanceState state) throws IOException {
-    InstanceInfo instance = jobStoreHandler.getInstance(uuid);
-    if (instance == null) {
-      throw new IllegalStateException("Cannot find registered instance with uuid:" + uuid
-          + ". Unable to update non-existing instance.");
-    }
-
-    JobDefinitionDesiredState desiredState = new JobDefinitionDesiredState()
-        .state(state)
-        .clusterId(instance.appId())
-        .resource(new JobDefinitionDesiredStateResource()
-            .memory(instance.status().getAllocatedMB())
-            .vCores(instance.status().getAllocatedVCores())
-            .queue(instance.status().getQueue()));
-    return updateInstanceState(instance, null, desiredState);
-  }
-
-  @Override
   public List<InstanceInfo> scanAllInstance(Properties prop) throws IOException {
     final List<InstanceInfo> instances = new ArrayList<>();
     clusters.forEach((id, handler) -> {
@@ -192,5 +138,39 @@ public class DirectDeployInstanceHandler implements InstanceHandler {
       }
     });
     return instances;
+  }
+
+  /**
+   * Main logic to initialize a new instance when {@link JobDefinition} was first
+   * invoked, with which no previous instance was associated.
+   *
+   * @param jobDefinition definition of job
+   * @param compilationResult compilation result of a job
+   * @return submission instance info
+   * @throws IOException when submission fails.
+   */
+  @VisibleForTesting
+  InstanceInfo initializeInstance(
+      JobDefinition jobDefinition,
+      JobCompilationResult compilationResult) throws IOException {
+    UUID jobUuid = jobDefinition.getUuid();
+    JobDefinitionDesiredState desiredState = jobDefinition.getDesiredState();
+    String clusterId = desiredState.getClusterId();
+    ClusterHandler handler = this.clusters.get(clusterId);
+    if (handler == null) {
+      throw new IllegalStateException("Cannot find application cluster handler for "
+          + "cluster:" + clusterId + " please change your configuration!");
+    }
+
+    // Create a new instance using the application handler.
+    UUID instanceUUID = UUID.randomUUID();
+    InstanceMetadata metadata = new InstanceMetadata(instanceUUID, jobUuid, jobDefinition.getTag().toString());
+    InstanceInfo instance = null;
+
+    InstanceStatus status = handler.deployApplication(metadata, compilationResult, desiredState);
+    instance = new InstanceInfo(clusterId, status.getApplicationId(), metadata, status);
+
+    jobStoreHandler.insertInstance(instanceUUID, instance);
+    return instance;
   }
 }

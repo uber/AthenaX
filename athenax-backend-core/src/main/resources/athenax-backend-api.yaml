@@ -86,31 +86,6 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/InstanceState'
-    put:
-      tags:
-        - apps
-      operationId: changeInstanceState
-      summary: Change the state of the instance
-      parameters:
-        - name: instanceUUID
-          in: path
-          description: UUID of the instance
-          required: true
-          type: string
-          format: uuid
-        - name: state
-          in: body
-          description: The desired state of the instance
-          required: true
-          schema:
-            $ref: '#/definitions/InstanceState'
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            $ref: '#/definitions/InstanceStatus'
   /jobs:
     get:
       tags:

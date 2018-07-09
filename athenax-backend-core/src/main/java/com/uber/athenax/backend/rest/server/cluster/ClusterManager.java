@@ -18,12 +18,10 @@
 
 package com.uber.athenax.backend.rest.server.cluster;
 
-
 import com.uber.athenax.backend.core.api.ClusterHandler;
 import com.uber.athenax.backend.rest.api.ClusterInfo;
 import com.uber.athenax.backend.rest.api.InstanceState;
 import com.uber.athenax.backend.rest.api.InstanceStatus;
-import com.uber.athenax.backend.rest.server.instance.InstanceManager;
 import org.apache.flink.annotation.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
+/**
+ * Server context implementation for managing jobs.
+ */
 package com.uber.athenax.backend.rest.server.job;
-
-public class JobManagerTest {
-}

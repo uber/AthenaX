@@ -18,7 +18,6 @@
 
 package com.uber.athenax.backend.rest.server.instance;
 
-import com.uber.athenax.backend.core.api.ClusterHandler;
 import com.uber.athenax.backend.core.api.InstanceHandler;
 import com.uber.athenax.backend.core.api.JobStoreHandler;
 import com.uber.athenax.backend.core.impl.instance.InstanceInfo;
@@ -39,11 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.uber.athenax.backend.rest.api.InstanceState.KILLED;
-
 /**
- * InstanceManager manages the instances associated with a {@link JobDefinition} that are deployed
- * and executed on compute clusters.
+ * InstanceManager manages the instances associated with a {@link JobDefinition}.
+ * Jobs are deployed and executed on compute clusters.
  *
  * <p>InstanceManager only contains soft states, that is, it can repopulate its state through
  * scanning the jobs on compute cluster via the {@link InstanceHandler} API.
@@ -52,8 +49,8 @@ import static com.uber.athenax.backend.rest.api.InstanceState.KILLED;
  * However, the external database is only used to verify active instances, as well as historic
  * instances with final state.
  *
- * It registers instance using {@link ClusterHandler} which provides APIs to interact with
- * a specific compute cluster.
+ * It registers instance using {@link com.uber.athenax.backend.core.api.ClusterHandler} which
+ * provides APIs to interact with a specific compute cluster.
  *
  * {@link InstanceHandler} is responsible for keeping the instances states up-to-date. </p>
  */
@@ -62,21 +59,24 @@ public class InstanceManager {
   private final JobStoreHandler jobStoreHandler;
   private final InstanceHandler instanceHandler;
   private final AthenaXTableCatalogProvider catalogProvider;
+  private final boolean updateInstanceOnRefresh;
 
   @VisibleForTesting
   public InstanceManager(
       JobStoreHandler jobStoreHandler,
       InstanceHandler instanceHandler,
-      AthenaXTableCatalogProvider catalogProvider) {
+      AthenaXTableCatalogProvider catalogProvider,
+      boolean updateInstanceOnRefresh) {
     this.jobStoreHandler = jobStoreHandler;
     this.instanceHandler = instanceHandler;
     this.catalogProvider = catalogProvider;
+    this.updateInstanceOnRefresh = updateInstanceOnRefresh;
   }
 
   /**
-   * Update instance upon job update.
+   * Update instance upon handling job update API request.
    *
-   * @param jobDefinition
+   * @param jobDefinition definition of a job.
    */
   public void instanceUpdateOnJobUpdate(
       JobDefinition jobDefinition) {
@@ -96,10 +96,25 @@ public class InstanceManager {
   }
 
   /**
+   * Update instance upon handling get instance status API request.
+   *
+   * @param updateStatus the newly updated/refreshed instance status from application cluster
+   */
+  public void instanceUpdateOnApplicationUpdate(
+      InstanceStatus updateStatus) {
+    try {
+      instanceHandler.onStatusUpdate(updateStatus);
+    } catch (IOException e) {
+      LOG.error("Error while performance instance update upon application changes for: "
+          + updateStatus.getApplicationId());
+    }
+  }
+
+  /**
    * Return the information of the job instance.
    *
-   * @param uuid
-   * @return
+   * @param uuid identifier for the instance
+   * @return status of the instance
    */
   public InstanceStatus getInstanceStatus(UUID uuid) {
     // Scan for existing instance in instanceManager
@@ -110,6 +125,8 @@ public class InstanceManager {
         // If cluster does not contain instance information,
         // return instance info stored in data store.
         instance = jobStoreHandler.getInstance(uuid);
+      } else if (updateInstanceOnRefresh) {
+        instanceUpdateOnApplicationUpdate(instance.status());
       }
     } catch (IOException e) {
       LOG.error("Error while getting instance information!", e);
@@ -119,8 +136,8 @@ public class InstanceManager {
 
   /**
    * Return the instance state of the job instance.
-   * @param uuid
-   * @return
+   * @param uuid identifier for the instance
+   * @return latest state of the instance
    */
   public InstanceState getInstanceState(UUID uuid) {
     InstanceStatus extendedState = getInstanceStatus(uuid);
@@ -131,39 +148,8 @@ public class InstanceManager {
   }
 
   /**
-   * Return the instance status of the job instance.
-   * @param uuid
-   * @return
-   */
-  public InstanceStatus changeInstanceState(UUID uuid, InstanceState desiredState) {
-    if (desiredState == null) {
-      throw new UnsupportedOperationException("State change cannot react on empty desired state!");
-    }
-
-    switch (desiredState) {
-      case KILLED:
-        try {
-          InstanceInfo instance = instanceHandler.getInstanceInfo(uuid);
-          if (instance == null) {
-            return null;
-          }
-          InstanceStatus newStatus = instanceHandler.updateInstanceState(uuid, KILLED);
-          jobStoreHandler.insertInstance(uuid, new InstanceInfo(instance.clusterName(),
-              instance.appId(), instance.metadata(), newStatus));
-          return newStatus;
-        } catch (IOException e) {
-          LOG.error("Unable to update instance to state: " + desiredState, e);
-          throw new RuntimeException("Unable to change instance state for: " + uuid
-              + " with desired state: " + desiredState, e);
-        }
-      default:
-        throw new UnsupportedOperationException("Unsupported desired state: " + desiredState.toString());
-    }
-  }
-
-  /**
    * Search and return all instances that met the requirements.
-   * @return
+   * @return list of all instances
    */
   public List<InstanceInfo> getInstances() {
     try {
@@ -175,11 +161,11 @@ public class InstanceManager {
   }
 
   /**
-   *
-   * @param job
-   * @param spec
-   * @return
-   * @throws Throwable
+   * compile a job definition into a job graph for Flink.
+   * @param job definition of the job
+   * @param spec desired state of a job
+   * @return compilation result
+   * @throws Throwable when compilation fails.
    */
   public JobCompilationResult compile(JobDefinition job, JobDefinitionDesiredState spec) throws Throwable {
     Map<String, AthenaXTableCatalog> inputs = catalogProvider.getInputCatalog(spec.getClusterId());
