@@ -284,3 +284,4 @@ definitions:
       - FINISHED
       - FAILED
       - KILLED
+      - UNKNOWN

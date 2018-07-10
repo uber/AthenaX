@@ -66,13 +66,14 @@ public class LocalMiniClusterHandlerTest {
     assertEquals(InstanceState.NEW, submissionStatus.getCurrentState());
 
     InstanceStatus checkStatus = handler.getApplicationStatus(submissionStatus.getApplicationId());
-    assertEquals(InstanceState.RUNNING, checkStatus.getCurrentState());
+    // expected to be failed for mock job graph
+    assertEquals(InstanceState.FAILED, checkStatus.getCurrentState());
 
     try {
       handler.terminateApplication(submissionStatus.getApplicationId());
       fail();
     } catch (IOException e) {
-      // expected;
+      // expected, job graph is not executable and should end in failed state
     }
   }
 

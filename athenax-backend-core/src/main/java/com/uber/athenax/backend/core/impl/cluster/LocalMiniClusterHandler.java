@@ -31,6 +31,7 @@ import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.configuration.TaskManagerOptions;
+import org.apache.flink.configuration.WebOptions;
 import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,6 @@ import static com.uber.athenax.backend.core.impl.cluster.util.FlinkSessionCluste
 
 /**
  * Example local mini-cluster implementation of the cluster handler.
- * It deploys application for verification purpose.
  *
  * <p>
  * This implementation of the {@link com.uber.athenax.backend.core.api.ClusterHandler} does not
@@ -70,13 +70,14 @@ public class LocalMiniClusterHandler extends RestSessionClusterHandler {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void open(AthenaXConfiguration conf) throws IOException {
     super.open(conf);
     Map<String, ?> clusterExtra = conf.clusters().get(clusterName).getExtras();
     Configuration clusterConf = new Configuration();
-    // Set up webserver
+    // Set up web server
     clusterConf.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
-    clusterConf.setInteger(RestOptions.PORT, Integer.parseInt(
+    clusterConf.setInteger(WebOptions.PORT, Integer.parseInt(
         (String) clusterExtra.get(RestOptions.PORT.key())));
     // Set # task manager
     clusterConf.setInteger(ConfigConstants.LOCAL_NUMBER_TASK_MANAGER, Integer.parseInt(

@@ -64,8 +64,11 @@ import static com.uber.athenax.backend.core.impl.cluster.util.FlinkSessionCluste
 import static com.uber.athenax.backend.core.impl.cluster.util.FlinkSessionClusterUtil.parseJobStatus;
 
 /**
- * Example a REST-based session cluster implementation of the cluster handler.
- * It establishes connections with a Flink session cluster via REST endpoints.
+ * Example for a REST-based session cluster implementation of the {@link ClusterHandler}
+ *
+ * <p>It establishes connections with a Flink session cluster via REST endpoints.
+ * Requires a Flink cluster to be already running.
+ * </p>
  */
 public class RestSessionClusterHandler implements ClusterHandler, AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(RestSessionClusterHandler.class);
@@ -189,6 +192,6 @@ public class RestSessionClusterHandler implements ClusterHandler, AutoCloseable 
   }
 
   private JobID constructJobIdFromAppId(String appId) {
-    return JobID.fromHexString(appId);
+    return JobID.fromHexString(appId.replace("-", ""));
   }
 }

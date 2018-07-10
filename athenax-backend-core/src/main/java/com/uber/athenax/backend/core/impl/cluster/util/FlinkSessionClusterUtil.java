@@ -72,7 +72,7 @@ public final class FlinkSessionClusterUtil {
   }
 
   public static InstanceState parseJobStatus(JobStatus jobStatus) {
-    // TODO fix me!
-    return InstanceState.RUNNING;
+    InstanceState currentState = InstanceState.fromValue(jobStatus.toString());
+    return currentState == null ? InstanceState.UNKNOWN : currentState;
   }
 }

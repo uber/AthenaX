@@ -20,23 +20,12 @@ package com.uber.athenax.backend.core.impl.cluster;
 
 import com.google.common.collect.ImmutableMap;
 import com.uber.athenax.backend.core.entities.AthenaXConfiguration;
-import com.uber.athenax.backend.core.impl.Utils;
-import com.uber.athenax.backend.core.impl.instance.InstanceMetadata;
 import com.uber.athenax.backend.core.impl.job.InMemoryJobStoreHandler;
 import com.uber.athenax.backend.rest.api.ClusterInfo;
-import com.uber.athenax.backend.rest.api.InstanceState;
-import com.uber.athenax.backend.rest.api.InstanceStatus;
-import com.uber.athenax.backend.rest.api.JobDefinitionDesiredState;
-import com.uber.athenax.backend.rest.api.JobDefinitionDesiredStateResource;
-import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -48,46 +37,7 @@ public class RestSessionClusterHandlerTest {
     AthenaXConfiguration conf = getMockConfig();
     RestSessionClusterHandler handler = new RestSessionClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
     handler.open(conf);
-    assertEquals(0, handler.listAllApplications(null).size());
     handler.close();
-  }
-
-  @Test
-  public void testDeployJobAndCheckStatus() throws Exception {
-    AthenaXConfiguration conf = getMockConfig();
-    RestSessionClusterHandler handler = new RestSessionClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
-    handler.open(conf);
-    InstanceStatus submissionStatus =
-        handler.deployApplication(getMockMetadata(), getMockCompilation(), getMockJobDesiredState());
-    assertEquals(InstanceState.NEW, submissionStatus.getCurrentState());
-
-    InstanceStatus checkStatus = handler.getApplicationStatus(submissionStatus.getApplicationId());
-    assertEquals(InstanceState.RUNNING, checkStatus.getCurrentState());
-
-    try {
-      handler.terminateApplication(submissionStatus.getApplicationId());
-      fail();
-    } catch (IOException e) {
-      // expected;
-    }
-  }
-
-  private static InstanceMetadata getMockMetadata() {
-    return new InstanceMetadata(UUID.randomUUID(), UUID.randomUUID(), "");
-  }
-
-  private static JobDefinitionDesiredState getMockJobDesiredState() {
-    return new JobDefinitionDesiredState()
-        .state(InstanceState.RUNNING)
-        .clusterId(CLUSTER_NAME)
-        .resource(new JobDefinitionDesiredStateResource());
-  }
-
-  private static JobCompilationResult getMockCompilation() {
-    JobCompilationResult compiledJob = mock(JobCompilationResult.class);
-    doReturn(Utils.trivialJobGraph()).when(compiledJob).jobGraph();
-    doReturn(Collections.emptyList()).when(compiledJob).additionalJars();
-    return compiledJob;
   }
 
   private static AthenaXConfiguration getMockConfig() throws IOException {
