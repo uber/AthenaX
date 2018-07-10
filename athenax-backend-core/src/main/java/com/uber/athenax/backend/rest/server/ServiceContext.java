@@ -94,8 +94,8 @@ public final class ServiceContext {
     return conf;
   }
 
-  public ClusterInfo getClusterInfo() {
-    return null;
+  public ClusterInfo getClusterInfo(String clusterID) {
+    return clusterManager.getClusterInfo(clusterID);
   }
 
   public InstanceStatus getJobInstanceStatus(UUID instanceUUID) {

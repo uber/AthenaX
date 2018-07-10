@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +41,11 @@ public class ClusterManager {
   @VisibleForTesting
   public ClusterManager(Map<String, ClusterHandler> clusterHandlerMap) {
     this.clusters = clusterHandlerMap;
+  }
+
+  public ClusterInfo getClusterInfo(String clusterID) {
+    // At this moment cluster info is not passed in any valid information, just return a stub here.
+    return new ClusterInfo().name(clusterID);
   }
 
   public InstanceState getApplicationState(String clusterName, String appId) throws IOException {
@@ -64,19 +68,5 @@ public class ClusterManager {
   public List<InstanceStatus> listApplications(String clusterName) throws IOException {
     ClusterHandler handler = clusters.get(clusterName);
     return handler.listAllApplications(null);
-  }
-
-  public class Builder {
-    private Map<String, ClusterHandler> clusterHandlerMap = new HashMap<>();
-
-    public Builder addClusterHandler(ClusterInfo info, ClusterHandler handler) {
-      String clusterName = info.getName();
-      this.clusterHandlerMap.put(clusterName, handler);
-      return this;
-    }
-
-    public ClusterManager build() {
-      return new ClusterManager(clusterHandlerMap);
-    }
   }
 }

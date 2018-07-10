@@ -101,7 +101,7 @@ public class AthenaXConfiguration {
     return clusters;
   }
 
-  public class JobStoreConfig {
+  public static class JobStoreConfig {
     @JsonProperty("job.store.class")
     private String jobStoreClass;
 
@@ -133,7 +133,7 @@ public class AthenaXConfiguration {
     }
   }
 
-  public class InstanceConfig {
+  public static class InstanceConfig {
     @JsonProperty("instance.handler.class")
     private String instanceHandlerClass;
 
@@ -165,7 +165,7 @@ public class AthenaXConfiguration {
     }
   }
 
-  public class ClusterConfig {
+  public static class ClusterConfig {
     @JsonProperty("cluster.handler.class")
     private String clusterHandlerClass;
 

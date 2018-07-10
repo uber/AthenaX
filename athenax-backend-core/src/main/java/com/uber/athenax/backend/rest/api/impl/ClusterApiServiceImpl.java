@@ -35,8 +35,8 @@ public class ClusterApiServiceImpl extends ClusterApiService {
   }
 
   @Override
-  public Response getClusterInfo(SecurityContext securityContext) throws NotFoundException {
-    ClusterInfo info = ctx.getClusterInfo();
+  public Response getClusterInfo(String clusterID, SecurityContext securityContext) throws NotFoundException {
+    ClusterInfo info = ctx.getClusterInfo(clusterID);
     return Response.ok().entity(info).build();
   }
 }

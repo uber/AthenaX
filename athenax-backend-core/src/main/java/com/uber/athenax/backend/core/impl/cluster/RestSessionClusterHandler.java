@@ -143,7 +143,7 @@ public class RestSessionClusterHandler implements ClusterHandler, AutoCloseable 
     JobID jobId = constructJobIdFromAppId(applicationId);
     JobDetailsHeaders headers = JobDetailsHeaders.getInstance();
     JobMessageParameters messageParams = headers.getUnresolvedMessageParameters();
-    messageParams.jobPathParameter.resolve(constructJobIdFromAppId(applicationId));
+    messageParams.jobPathParameter.resolve(jobId);
     try {
       CompletableFuture<JobDetailsInfo> future = restClient.sendRequest(host, port, headers,
           messageParams,
