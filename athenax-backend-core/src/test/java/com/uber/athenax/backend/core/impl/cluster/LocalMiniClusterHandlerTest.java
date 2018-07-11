@@ -32,6 +32,8 @@ import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.configuration.TaskManagerOptions;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -47,20 +49,22 @@ import static org.mockito.Mockito.mock;
 public class LocalMiniClusterHandlerTest {
   private static final String CLUSTER_NAME = "local_cluster";
 
-  @Test
-  public void testStartUp() throws Exception {
+  private LocalMiniClusterHandler handler;
+
+  @Before
+  public void setUp() throws Exception {
     AthenaXConfiguration conf = getMockConfig();
-    LocalMiniClusterHandler handler = new LocalMiniClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
+    handler = new LocalMiniClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
     handler.open(conf);
-    assertEquals(0, handler.listAllApplications(null).size());
+  }
+
+  @After
+  public void tearDown() throws Exception {
     handler.close();
   }
 
   @Test
   public void testDeployJobAndCheckStatus() throws Exception {
-    AthenaXConfiguration conf = getMockConfig();
-    LocalMiniClusterHandler handler = new LocalMiniClusterHandler(new ClusterInfo().name(CLUSTER_NAME));
-    handler.open(conf);
     InstanceStatus submissionStatus =
         handler.deployApplication(getMockMetadata(), getMockCompilation(), getMockJobDesiredState());
     assertEquals(InstanceState.NEW, submissionStatus.getCurrentState());
