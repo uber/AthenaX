@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -70,8 +71,8 @@ public class LocalMiniClusterHandlerTest {
     assertEquals(InstanceState.NEW, submissionStatus.getCurrentState());
 
     InstanceStatus checkStatus = handler.getApplicationStatus(submissionStatus.getApplicationId());
-    // expected to be failed for mock job graph
-    assertEquals(InstanceState.FAILED, checkStatus.getCurrentState());
+    // expected to be failed for mock job graph, but it can still be running, just assert no longer in new state
+    assertNotEquals(InstanceState.NEW, checkStatus.getCurrentState());
 
     try {
       handler.terminateApplication(submissionStatus.getApplicationId());
