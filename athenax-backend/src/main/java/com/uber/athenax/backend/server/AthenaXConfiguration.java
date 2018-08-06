@@ -72,7 +72,7 @@ public class AthenaXConfiguration {
     private final Set<String> resourcesToLocalize;
 
     /**
-     * JARs that will be localized and put into the classpaths for bot JobManager and TaskManager.
+     * JARs that will be localized and put into the classpaths for both JobManager and TaskManager.
      */
     @JsonProperty("additional.jars")
     private final Set<String> additionalJars;

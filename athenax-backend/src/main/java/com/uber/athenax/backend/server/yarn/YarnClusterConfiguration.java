@@ -50,7 +50,7 @@ public class YarnClusterConfiguration {
   private final Set<Path> resourcesToLocalize;
 
   /**
-   * JARs that will be localized and put into the classpaths for bot JobManager and TaskManager.
+   * JARs that will be localized and put into the classpaths for both JobManager and TaskManager.
    */
   private final Set<Path> systemJars;
 
