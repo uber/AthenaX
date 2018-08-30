@@ -73,7 +73,7 @@ import static org.apache.hadoop.yarn.api.records.YarnApplicationState.NEW;
  * <p>NOTE: There is no support for secure YARN cluster yet.</p>
  */
 class AthenaXYarnClusterDescriptor extends AbstractYarnClusterDescriptor {
-    static final String ATHENAX_APPLICATION_TYPE = "AthenaX+Flink";
+    static final String ATHENAX_APPLICATION_TYPE = "OStream";
     private static final Logger LOG = LoggerFactory.getLogger(AthenaXYarnClusterDescriptor.class);
     private static final int MAX_ATTEMPT = 1;
     private static final long DEPLOY_TIMEOUT_MS = 600 * 1000;
