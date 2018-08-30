@@ -28,14 +28,15 @@ public class OStreamTableCatalogProvider implements AthenaXTableCatalogProvider 
         @Override
         public ExternalCatalogTable getTable(String tableName) throws TableNotExistException {
             if ("source".equals(tableName)) {
-                ConnectorDescriptor connectorDescriptor = new FileSystem().path("/tmp/csv/test.csv");
+                Properties props = new Properties();
+                props.put("bootstrap.servers", "localhost:9092");
+                ConnectorDescriptor connectorDescriptor = new Kafka().version("0.10")
+                        .topic("inputJerry").properties(props).startFromGroupOffsets();
                 TableSchema schema = new TableSchemaBuilder()
                         .field("id", Types.INT())
                         .field("name", Types.STRING())
                         .build();
-                FormatDescriptor formatDescriptor = new Csv()
-                        .field("id", Types.INT())
-                        .field("name", Types.STRING());
+                FormatDescriptor formatDescriptor = new Json().schema(schema.toRowType());
                 ExternalCatalogTable source = ExternalCatalogTable.builder(connectorDescriptor)
                         .withFormat(formatDescriptor)
                         .withSchema(new Schema().schema(schema))
