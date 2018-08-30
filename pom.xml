@@ -28,7 +28,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- The version of calcite should be consistent with the one used by Flink -->
     <calcite.version>1.16.0</calcite.version>
-    <flink.version>1.5.0</flink.version>
+    <flink.version>1.6.0</flink.version>
     <flink.shaded.version>1.5.0</flink.shaded.version>
     <hadoop.version>2.7.4</hadoop.version>
     <jackson.version>1.9.13</jackson.version>
@@ -45,8 +45,6 @@
     <module>athenax-backend</module>
     <module>athenax-vm-compiler</module>
     <module>athenax-vm-connectors/athenax-vm-connector-common</module>
-    <module>athenax-vm-connectors/athenax-vm-connector-kafka</module>
-    <module>athenax-tests</module>
   </modules>
 
   <dependencyManagement>

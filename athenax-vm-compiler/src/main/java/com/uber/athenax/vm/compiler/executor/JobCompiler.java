@@ -30,6 +30,7 @@ import org.apache.flink.streaming.api.graph.StreamGraph;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.ExternalCatalogTable;
+import org.apache.flink.table.factories.TableFactoryUtil;
 import org.apache.flink.table.functions.AggregateFunction;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.apache.flink.table.functions.TableFunction;
@@ -106,8 +107,10 @@ public class JobCompiler {
         .registerUdfs()
         .registerInputCatalogs();
     Table table = env.sqlQuery(job.sql());
+
     for (String t : job.outputs().listTables()) {
-      table.writeToSink(getOutputTable(job.outputs().getTable(t)));
+      ExternalCatalogTable tb = job.outputs().getTable(t);
+      table.writeToSink(TableFactoryUtil.findAndCreateTableSink(env, tb));
     }
     StreamGraph streamGraph = exeEnv.getStreamGraph();
     return streamGraph.getJobGraph();
