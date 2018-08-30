@@ -110,7 +110,8 @@ public class JobCompiler {
 
     for (String t : job.outputs().listTables()) {
       ExternalCatalogTable tb = job.outputs().getTable(t);
-      table.writeToSink(TableFactoryUtil.findAndCreateTableSink(env, tb));
+      env.registerTableSink(t,TableFactoryUtil.findAndCreateTableSink(env, tb));
+      table.insertInto(t);
     }
     StreamGraph streamGraph = exeEnv.getStreamGraph();
     return streamGraph.getJobGraph();

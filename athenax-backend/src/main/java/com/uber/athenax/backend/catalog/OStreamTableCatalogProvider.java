@@ -2,14 +2,16 @@ package com.uber.athenax.backend.catalog;
 
 import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
 import com.uber.athenax.vm.api.tables.AthenaXTableCatalogProvider;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.api.*;
 import org.apache.flink.table.catalog.ExternalCatalog;
 import org.apache.flink.table.catalog.ExternalCatalogTable;
 import org.apache.flink.table.descriptors.*;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.*;
 
-public class OppoTableCatalogProvider implements AthenaXTableCatalogProvider {
+public class OStreamTableCatalogProvider implements AthenaXTableCatalogProvider {
     private AthenaXTableCatalog catalog = new OppoTableCatalog();
 
     @Override
@@ -41,14 +43,15 @@ public class OppoTableCatalogProvider implements AthenaXTableCatalogProvider {
                         .asTableSource();
                 return source;
             } else if ("target".equals(tableName)) {
-                ConnectorDescriptor connectorDescriptor1 = new FileSystem().path("/tmp/csv/output.csv");
-                TableSchemaBuilder build1 = new TableSchemaBuilder();
-                TableSchema schema1 = build1.field("id", Types.INT())
+                Properties props = new Properties();
+                props.put("bootstrap.servers", "localhost:9092");
+                ConnectorDescriptor connectorDescriptor1 = new Kafka().version("0.10")
+                        .topic("outputJerry").properties(props).startFromGroupOffsets();
+                TableSchema schema1 = new TableSchemaBuilder()
+                        .field("id", Types.INT())
                         .field("name", Types.STRING())
                         .build();
-                FormatDescriptor formatDescriptor1 = new Csv()
-                        .field("id", Types.INT())
-                        .field("name", Types.STRING());
+                FormatDescriptor formatDescriptor1 = new Json().schema(schema1.toRowType());
                 ExternalCatalogTable sink = ExternalCatalogTable.builder(connectorDescriptor1)
                         .withFormat(formatDescriptor1)
                         .withSchema(new Schema().schema(schema1))

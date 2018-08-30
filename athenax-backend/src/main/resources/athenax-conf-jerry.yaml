@@ -17,7 +17,7 @@
 ################################################################################
 
 athenax.master.uri: http://localhost:8083
-catalog.impl: com.uber.athenax.backend.catalog.OppoTableCatalogProvider
+catalog.impl: com.uber.athenax.backend.catalog.OStreamTableCatalogProvider
 extras:
  foo: bar
  jobstore.leveldb.file: /tmp/athenax
