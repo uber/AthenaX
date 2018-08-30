@@ -185,6 +185,10 @@ class AthenaXYarnClusterDescriptor extends AbstractYarnClusterDescriptor {
       Map<String, LocalResource> resources,
       Set<Path> shippedPaths
   ) throws IOException {
+
+    resources.put("flink.jar", toLocalResource(clusterConf.flinkUberJar(),
+            LocalResourceVisibility.APPLICATION));
+
     for (Path p : clusterConf.resourcesToLocalize()) {
       resources.put(p.getName(), toLocalResource(p, LocalResourceVisibility.APPLICATION));
     }
