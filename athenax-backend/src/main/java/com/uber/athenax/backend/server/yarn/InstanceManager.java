@@ -23,6 +23,7 @@ import com.uber.athenax.backend.api.InstanceStatus;
 import com.uber.athenax.backend.api.JobDefinitionDesiredstate;
 import com.uber.athenax.backend.server.AthenaXConfiguration;
 import com.uber.athenax.backend.server.InstanceStateUpdateListener;
+import com.uber.athenax.backend.server.jobs.JobWatcherUtil;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.flink.configuration.Configuration;
@@ -82,6 +83,8 @@ public class InstanceManager implements AutoCloseable {
 
   private final AtomicReference<ConcurrentHashMap<UUID, InstanceInfo>> instances
       = new AtomicReference<>(new ConcurrentHashMap<>());
+  private final AtomicReference<ConcurrentHashMap<UUID, InstanceInfo>> jobs
+          = new AtomicReference<>(new ConcurrentHashMap<>());
 
   @VisibleForTesting
   InstanceManager(
@@ -119,6 +122,14 @@ public class InstanceManager implements AutoCloseable {
     return info.status();
   }
 
+  public InstanceStatus getJobInstanceStatus(UUID jobid) {
+    InstanceInfo info = jobs().get(jobid);
+    if (info == null) {
+      return null;
+    }
+    return info.status();
+  }
+
   public InstanceState getInstanceState(UUID uuid) {
     InstanceStatus stat = getInstanceStatus(uuid);
     if (stat == null) {
@@ -147,6 +158,10 @@ public class InstanceManager implements AutoCloseable {
 
   public ConcurrentHashMap<UUID, InstanceInfo> instances() {
     return instances.get();
+  }
+
+  public ConcurrentHashMap<UUID, InstanceInfo> jobs() {
+    return jobs.get();
   }
 
   public void start() {
@@ -200,20 +215,23 @@ public class InstanceManager implements AutoCloseable {
   @VisibleForTesting
   void scanAll() throws IOException, YarnException {
     ConcurrentHashMap<UUID, InstanceInfo> newInstances = new ConcurrentHashMap<>();
+    ConcurrentHashMap<UUID, InstanceInfo> newJobs = new ConcurrentHashMap<>();
     for (ClusterInfo cluster : clusters.values()) {
       List<ApplicationReport> reports = cluster.client()
-          .getApplications(Collections.singleton(ATHENAX_APPLICATION_TYPE));
+          .getApplications(Collections.singleton(ATHENAX_APPLICATION_TYPE), JobWatcherUtil.ALIVE_STATE);
       for (ApplicationReport report : reports) {
         InstanceInfo instance = Utils.extractInstanceInfo(cluster.name(), report);
         if (instance == null) {
           LOG.warn("Failed to retrieve instance info for {}:{}", cluster.name(), report.getApplicationId());
         } else {
           newInstances.put(instance.metadata().uuid(), instance);
+          newJobs.put(instance.metadata().jobDefinition(), instance);
         }
       }
     }
     LOG.info("Inspected {} active instances", newInstances.size());
     instances.set(newInstances);
+    jobs.set(newJobs);
     listener.onUpdatedInstances(newInstances);
   }
 }
