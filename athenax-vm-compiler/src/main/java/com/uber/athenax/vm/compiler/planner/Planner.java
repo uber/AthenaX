@@ -30,17 +30,16 @@ import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.hadoop.fs.Path;
 
 import java.io.StringReader;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Planner {
   private static final int DEFAULT_IDENTIFIER_MAX_LENGTH = 128;
 
-  private final Map<String, AthenaXTableCatalog> inputs;
-  private final AthenaXTableCatalog outputs;
+  private List<String> outputs;
 
-  public Planner(Map<String, AthenaXTableCatalog> inputs, AthenaXTableCatalog outputs) {
-    this.inputs = inputs;
+  public Planner(List<String> outputs) {
     this.outputs = outputs;
   }
 
@@ -50,7 +49,7 @@ public class Planner {
     validator.validateQuery(stmts);
     JobDescriptor job = new JobDescriptor(
         validator.userDefinedFunctions(),
-        outputs.listTables(),
+        outputs,
         parallelism,
         validator.statement().toString());
     // uses contained executor instead of direct compile for: JobCompiler.compileJob(job);

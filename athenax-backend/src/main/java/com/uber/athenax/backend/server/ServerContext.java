@@ -39,7 +39,7 @@ public final class ServerContext {
   private JobStore jobStore;
   private JobManager jobManager;
   private WatchdogPolicy watchdogPolicy;
-  private AthenaXTableCatalogProvider catalogs;
+  //private AthenaXTableCatalogProvider catalogs;
   private AthenaXConfiguration conf;
 
   private ServerContext() {
@@ -49,8 +49,8 @@ public final class ServerContext {
   public void initialize(AthenaXConfiguration conf) throws ClassNotFoundException, IOException {
     this.conf = conf;
     this.jobStore = (JobStore) instantiate(Class.forName(conf.jobStoreImpl()));
-    this.catalogs = (AthenaXTableCatalogProvider) instantiate(Class.forName(conf.catalogProvider()));
-    this.jobManager = new JobManager(jobStore, catalogs);
+    //this.catalogs = (AthenaXTableCatalogProvider) instantiate(Class.forName(conf.catalogProvider()));
+    this.jobManager = new JobManager(jobStore);
     this.instanceManager = InstanceManager.create(conf, jobManager, executor);
     this.watchdogPolicy = (WatchdogPolicy) instantiate(Class.forName(conf.watchdogPolicyImpl()));
   }
@@ -74,10 +74,6 @@ public final class ServerContext {
 
   public JobManager jobManager() {
     return jobManager;
-  }
-
-  public AthenaXTableCatalogProvider catalogs() {
-    return catalogs;
   }
 
   public ScheduledExecutorService executor() {

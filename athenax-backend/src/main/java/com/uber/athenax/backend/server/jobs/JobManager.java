@@ -41,11 +41,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JobManager implements InstanceStateUpdateListener {
   private static final Logger LOG = LoggerFactory.getLogger(JobManager.class);
   private final JobStore jobStore;
-  private final AthenaXTableCatalogProvider catalogProvider;
 
-  public JobManager(JobStore jobStore, AthenaXTableCatalogProvider catalogProvider) {
+  public JobManager(JobStore jobStore) {
     this.jobStore = jobStore;
-    this.catalogProvider = catalogProvider;
   }
 
   public UUID newJobUUID() {
@@ -70,8 +68,8 @@ public class JobManager implements InstanceStateUpdateListener {
 
   public JobCompilationResult compile(JobDefinition job, JobDefinitionDesiredstate spec) throws Throwable {
     //Map<String, AthenaXTableCatalog> inputs = catalogProvider.getInputCatalog(spec.getClusterId());
-    AthenaXTableCatalog output = catalogProvider.getOutputCatalog(spec.getClusterId(), job.getOutputs());
-    Planner planner = new Planner(null, output);
+    //AthenaXTableCatalog output = catalogProvider.getOutputCatalog(spec.getClusterId(), job.getOutputs());
+    Planner planner = new Planner(job.getOutputs());
     return planner.sql(job.getQuery(), Math.toIntExact(spec.getResource().getVCores()));
   }
 

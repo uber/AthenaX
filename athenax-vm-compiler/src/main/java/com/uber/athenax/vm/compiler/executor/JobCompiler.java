@@ -55,7 +55,7 @@ public class JobCompiler {
   private final StreamTableEnvironment env;
   private final JobDescriptor job;
 
-  private static final OStreamTableCatalogProvider catalogProvider = new OStreamTableCatalogProvider();
+  private final OStreamTableCatalogProvider catalogProvider = new OStreamTableCatalogProvider();
 
   JobCompiler(StreamTableEnvironment env, JobDescriptor job) {
     this.job = job;
