@@ -60,6 +60,6 @@ final class Utils {
         .runningContainers((long) usage.getNumUsedContainers())
         .trackingUrl(report.getTrackingUrl())
         .state(InstanceStatus.StateEnum.fromValue(report.getYarnApplicationState().toString()));
-    return new InstanceInfo(clusterName, report.getApplicationId(), md, stat);
+    return new InstanceInfo(clusterName, report.getApplicationId(), report.getQueue(), md, stat);
   }
 }

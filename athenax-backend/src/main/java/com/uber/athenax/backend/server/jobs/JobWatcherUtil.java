@@ -149,9 +149,12 @@ final public class JobWatcherUtil {
   }
 
   static JobDefinitionDesiredstate computeActualState(InstanceInfo info) {
+    // jerryjzhang: substract resource usage of applicaiton master, otherwise
+    //              state comparison will always fail
     JobDefinitionResource r = new JobDefinitionResource()
-        .memory(info.status().getAllocatedMB())
-        .vCores(info.status().getAllocatedVCores());
+        .memory(info.status().getAllocatedMB() - 1024)
+        .vCores(info.status().getAllocatedVCores() - 1)
+        .queue(info.queue());
     JobDefinitionDesiredstate s = new JobDefinitionDesiredstate()
         .clusterId(info.clusterName())
         .resource(r);

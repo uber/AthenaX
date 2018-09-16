@@ -50,7 +50,7 @@ public class InstanceManagerTest {
         mock(InstanceStateUpdateListener.class),
         mock(ScheduledExecutorService.class),
         AthenaXExtraConfigOptions.INSTANCE_MANAGER_RESCAN_INTERVAL.defaultValue())) {
-      InstanceInfo instance = new InstanceInfo("foo", yarnAppId,
+      InstanceInfo instance = new InstanceInfo("foo", yarnAppId, "default",
           mock(InstanceMetadata.class), mock(InstanceStatus.class));
       manager.instances().put(app, instance);
       manager.changeState(app, new InstanceState().state(InstanceState.StateEnum.KILLED));
