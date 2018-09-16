@@ -17,7 +17,7 @@
 ################################################################################
 
 athenax.master.uri: http://localhost:8083
-catalog.impl: com.uber.athenax.backend.catalog.OStreamTableCatalogProvider
+catalog.impl: com.oppo.dc.catalog.OStreamTableCatalogProvider
 extras:
  foo: bar
  jobstore.leveldb.file: /tmp/athenax
@@ -26,8 +26,8 @@ clusters:
     yarn.site.location: /Users/jerryjzhang/work/bigdata/hadoop-2.7.2/etc/hadoop/yarn-site.xml
     athenax.home.dir: hdfs://localhost:9020/athenax/dir
     flink.uber.jar.location: hdfs://localhost:9020/athenax/jar/flink-uber.jar
-    additional.jars:
-          - hdfs://localhost:9020/athenax/jar/flink-table.jar
+#    additional.jars:
+#          - hdfs://localhost:9020/athenax/jar/flink-table.jar
     localize.resources:
           - hdfs://localhost:9020/athenax/conf/log4j.properties
           - hdfs://localhost:9020/athenax/conf/flink-conf.yaml

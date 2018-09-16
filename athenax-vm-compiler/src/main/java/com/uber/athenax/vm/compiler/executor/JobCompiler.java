@@ -18,6 +18,7 @@
 
 package com.uber.athenax.vm.compiler.executor;
 
+import com.oppo.dc.catalog.OStreamTableCatalogProvider;
 import com.uber.athenax.vm.api.functions.AthenaXAggregateFunction;
 import com.uber.athenax.vm.api.functions.AthenaXScalarFunction;
 import com.uber.athenax.vm.api.functions.AthenaXTableFunction;
@@ -53,6 +54,8 @@ public class JobCompiler {
   private static final Logger LOG = LoggerFactory.getLogger(JobCompiler.class);
   private final StreamTableEnvironment env;
   private final JobDescriptor job;
+
+  private static final OStreamTableCatalogProvider catalogProvider = new OStreamTableCatalogProvider();
 
   JobCompiler(StreamTableEnvironment env, JobDescriptor job) {
     this.job = job;
@@ -108,8 +111,9 @@ public class JobCompiler {
         .registerInputCatalogs();
     Table table = env.sqlQuery(job.sql());
 
-    for (String t : job.outputs().listTables()) {
-      ExternalCatalogTable tb = job.outputs().getTable(t);
+    AthenaXTableCatalog outputCatalog = catalogProvider.getOutputCatalog("", job.outputs());
+    for (String t : job.outputs()) {
+      ExternalCatalogTable tb = outputCatalog.getTable(t);
       env.registerTableSink(t,TableFactoryUtil.findAndCreateTableSink(env, tb));
       table.insertInto(t);
     }
@@ -150,7 +154,7 @@ public class JobCompiler {
   }
 
   private JobCompiler registerInputCatalogs() {
-    for (Map.Entry<String, AthenaXTableCatalog> e : job.inputs().entrySet()) {
+    for (Map.Entry<String, AthenaXTableCatalog> e : catalogProvider.getInputCatalog("").entrySet()) {
       LOG.debug("Registering input catalog {}", e.getKey());
       env.registerExternalCatalog(e.getKey(), e.getValue());
     }

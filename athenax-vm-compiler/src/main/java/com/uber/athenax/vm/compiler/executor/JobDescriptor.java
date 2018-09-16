@@ -24,40 +24,34 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 public class JobDescriptor implements Serializable {
   private static final long serialVersionUID = -1;
   private final Map<String, String> userDefineFunctions;
-  private final Map<String, AthenaXTableCatalog> inputs;
-  private final AthenaXTableCatalog outputs;
   private final int parallelism;
 
   /**
    * Stripped down statement that can be recognized by Flink.
    */
   private final String sqlStatement;
+  private final List<String> outputs;
 
-  public JobDescriptor(Map<String, AthenaXTableCatalog> inputs,
-                       Map<String, String> userDefineFunctions,
-                       AthenaXTableCatalog outputs,
+  public JobDescriptor(Map<String, String> userDefineFunctions,
+                       List<String> outputs,
                        int parallelism, String sqlStatement) {
     this.userDefineFunctions = userDefineFunctions;
-    this.inputs = inputs;
-    this.outputs = outputs;
     this.parallelism = parallelism;
     this.sqlStatement = sqlStatement;
+    this.outputs = outputs;
   }
 
   Map<String, String> udf() {
     return userDefineFunctions;
   }
 
-  Map<String, AthenaXTableCatalog> inputs() {
-    return inputs;
-  }
-
-  AthenaXTableCatalog outputs() {
+  List<String> outputs() {
     return outputs;
   }
 

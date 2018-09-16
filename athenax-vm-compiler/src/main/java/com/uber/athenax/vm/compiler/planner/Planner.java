@@ -49,9 +49,8 @@ public class Planner {
     Validator validator = new Validator();
     validator.validateQuery(stmts);
     JobDescriptor job = new JobDescriptor(
-        inputs,
         validator.userDefinedFunctions(),
-        outputs,
+        outputs.listTables(),
         parallelism,
         validator.statement().toString());
     // uses contained executor instead of direct compile for: JobCompiler.compileJob(job);

@@ -60,8 +60,8 @@ public class ContainedExecutor {
     ops.add(jvm.toString());
 
     // Add below lines to debug compilation process
-//    ops.add("-Xdebug");
-//    ops.add("-Xrunjdwp:transport=dt_socket,address=7079,server=y,suspend=y");
+    ops.add("-Xdebug");
+    ops.add("-Xrunjdwp:transport=dt_socket,address=7079,server=y,suspend=y");
 
     ops.add("-classpath");
     ops.add(System.getProperty("java.class.path"));
