@@ -24,8 +24,6 @@ import com.uber.athenax.backend.api.JobDefinitionDesiredstate;
 import com.uber.athenax.backend.server.InstanceStateUpdateListener;
 import com.uber.athenax.backend.server.ServerContext;
 import com.uber.athenax.backend.server.yarn.InstanceInfo;
-import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
-import com.uber.athenax.vm.api.tables.AthenaXTableCatalogProvider;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 import com.uber.athenax.vm.compiler.planner.Planner;
 import org.slf4j.Logger;
@@ -34,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -22,7 +22,6 @@ import com.uber.athenax.backend.server.jobs.JobManager;
 import com.uber.athenax.backend.server.jobs.JobStore;
 import com.uber.athenax.backend.server.jobs.WatchdogPolicy;
 import com.uber.athenax.backend.server.yarn.InstanceManager;
-import com.uber.athenax.vm.api.tables.AthenaXTableCatalogProvider;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;

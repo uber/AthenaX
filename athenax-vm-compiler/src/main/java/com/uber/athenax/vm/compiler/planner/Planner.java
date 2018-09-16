@@ -18,7 +18,6 @@
 
 package com.uber.athenax.vm.compiler.planner;
 
-import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
 import com.uber.athenax.vm.compiler.executor.CompilationResult;
 import com.uber.athenax.vm.compiler.executor.ContainedExecutor;
 import com.uber.athenax.vm.compiler.executor.JobDescriptor;
@@ -31,7 +30,6 @@ import org.apache.hadoop.fs.Path;
 
 import java.io.StringReader;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Planner {
