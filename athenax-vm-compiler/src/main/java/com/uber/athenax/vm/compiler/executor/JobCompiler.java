@@ -18,7 +18,7 @@
 
 package com.uber.athenax.vm.compiler.executor;
 
-import com.oppo.dc.catalog.OStreamTableCatalogProvider;
+import com.oppo.dc.ostream.catalog.OStreamTableCatalogProvider;
 import com.uber.athenax.vm.api.functions.AthenaXAggregateFunction;
 import com.uber.athenax.vm.api.functions.AthenaXScalarFunction;
 import com.uber.athenax.vm.api.functions.AthenaXTableFunction;

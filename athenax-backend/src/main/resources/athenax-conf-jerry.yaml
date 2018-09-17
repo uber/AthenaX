@@ -18,6 +18,7 @@
 
 athenax.master.uri: http://localhost:8083
 catalog.impl: com.oppo.dc.catalog.OStreamTableCatalogProvider
+jobstore.impl: com.oppo.dc.ostream.job.OStreamJobStore
 extras:
  foo: bar
  jobstore.leveldb.file: /tmp/athenax
