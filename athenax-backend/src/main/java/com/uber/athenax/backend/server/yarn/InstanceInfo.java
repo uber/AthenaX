@@ -24,13 +24,15 @@ import org.apache.hadoop.yarn.api.records.ApplicationId;
 public class InstanceInfo {
   private final String clusterName;
   private final ApplicationId appId;
+  private final String queue;
   private final InstanceMetadata metadata;
   private final InstanceStatus status;
 
-  public InstanceInfo(String clusterName, ApplicationId appId,
+  public InstanceInfo(String clusterName, ApplicationId appId, String queue,
                InstanceMetadata metadata, InstanceStatus status) {
     this.metadata = metadata;
     this.clusterName = clusterName;
+    this.queue = queue;
     this.appId = appId;
     this.status = status;
   }
@@ -49,5 +51,9 @@ public class InstanceInfo {
 
   public InstanceStatus status() {
     return status;
+  }
+
+  public String queue() {
+    return queue;
   }
 }

@@ -23,6 +23,7 @@ import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.ExternalCatalogTable;
 import org.apache.flink.table.descriptors.ConnectorDescriptor;
 import org.apache.flink.table.descriptors.DescriptorProperties;
+import org.apache.flink.table.descriptors.Schema;
 import org.apache.flink.types.Row;
 import scala.Option;
 
@@ -59,7 +60,7 @@ public class MockExternalCatalogTable implements Serializable {
         properties.putString(TABLE_DATA_CONNECTOR_PROPERTY, serializeRows());
       }
     };
-    return new ExternalCatalogTable(descriptor, Option.empty(), Option.empty(), Option.empty(), Option.empty());
+    return ExternalCatalogTable.builder(descriptor).withSchema(new Schema().schema(tableSchema)).asTableSourceAndSink();
   }
 
   private String serializeRows() {

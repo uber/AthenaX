@@ -24,8 +24,6 @@ import com.uber.athenax.backend.api.JobDefinitionDesiredstate;
 import com.uber.athenax.backend.server.InstanceStateUpdateListener;
 import com.uber.athenax.backend.server.ServerContext;
 import com.uber.athenax.backend.server.yarn.InstanceInfo;
-import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
-import com.uber.athenax.vm.api.tables.AthenaXTableCatalogProvider;
 import com.uber.athenax.vm.compiler.planner.JobCompilationResult;
 import com.uber.athenax.vm.compiler.planner.Planner;
 import org.slf4j.Logger;
@@ -34,18 +32,15 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JobManager implements InstanceStateUpdateListener {
   private static final Logger LOG = LoggerFactory.getLogger(JobManager.class);
   private final JobStore jobStore;
-  private final AthenaXTableCatalogProvider catalogProvider;
 
-  public JobManager(JobStore jobStore, AthenaXTableCatalogProvider catalogProvider) {
+  public JobManager(JobStore jobStore) {
     this.jobStore = jobStore;
-    this.catalogProvider = catalogProvider;
   }
 
   public UUID newJobUUID() {
@@ -69,9 +64,9 @@ public class JobManager implements InstanceStateUpdateListener {
   }
 
   public JobCompilationResult compile(JobDefinition job, JobDefinitionDesiredstate spec) throws Throwable {
-    Map<String, AthenaXTableCatalog> inputs = catalogProvider.getInputCatalog(spec.getClusterId());
-    AthenaXTableCatalog output = catalogProvider.getOutputCatalog(spec.getClusterId(), job.getOutputs());
-    Planner planner = new Planner(inputs, output);
+    //Map<String, AthenaXTableCatalog> inputs = catalogProvider.getInputCatalog(spec.getClusterId());
+    //AthenaXTableCatalog output = catalogProvider.getOutputCatalog(spec.getClusterId(), job.getOutputs());
+    Planner planner = new Planner(job.getOutputs());
     return planner.sql(job.getQuery(), Math.toIntExact(spec.getResource().getVCores()));
   }
 

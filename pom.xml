@@ -28,13 +28,13 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- The version of calcite should be consistent with the one used by Flink -->
     <calcite.version>1.16.0</calcite.version>
-    <flink.version>1.5.0</flink.version>
+    <flink.version>1.6.0</flink.version>
     <flink.shaded.version>1.5.0</flink.shaded.version>
     <hadoop.version>2.7.4</hadoop.version>
     <jackson.version>1.9.13</jackson.version>
     <jackson2.version>2.7.4</jackson2.version>
     <jersey.version>1.19.4</jersey.version>
-    <kafka.version>0.9.0.1</kafka.version>
+    <kafka.version>0.10.2.1</kafka.version>
     <scala.binary.version>2.11</scala.binary.version>
     <scala.version>2.11.11</scala.version>
     <slf4j.version>1.7.7</slf4j.version>
@@ -45,8 +45,6 @@
     <module>athenax-backend</module>
     <module>athenax-vm-compiler</module>
     <module>athenax-vm-connectors/athenax-vm-connector-common</module>
-    <module>athenax-vm-connectors/athenax-vm-connector-kafka</module>
-    <module>athenax-tests</module>
   </modules>
 
   <dependencyManagement>
@@ -195,11 +193,11 @@
         <classifier>tests</classifier>
         <scope>test</scope>
       </dependency>
-      <dependency>
-        <groupId>com.uber.athenax</groupId>
-        <artifactId>athenax-vm-connector-kafka</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>com.uber.athenax</groupId>-->
+        <!--<artifactId>athenax-vm-connector-kafka</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
       <dependency>
         <groupId>com.uber.athenax</groupId>
         <artifactId>athenax-vm-connector-kafka</artifactId>
@@ -261,7 +259,12 @@
       </dependency>
       <dependency>
         <groupId>org.apache.flink</groupId>
-        <artifactId>flink-connector-kafka-0.9_${scala.binary.version}</artifactId>
+        <artifactId>flink-json</artifactId>
+        <version>${flink.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.flink</groupId>
+        <artifactId>flink-connector-kafka-0.10_${scala.binary.version}</artifactId>
         <version>${flink.version}</version>
       </dependency>
       <dependency>

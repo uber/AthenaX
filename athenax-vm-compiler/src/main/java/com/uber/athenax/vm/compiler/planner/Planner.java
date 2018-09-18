@@ -18,7 +18,6 @@
 
 package com.uber.athenax.vm.compiler.planner;
 
-import com.uber.athenax.vm.api.tables.AthenaXTableCatalog;
 import com.uber.athenax.vm.compiler.executor.CompilationResult;
 import com.uber.athenax.vm.compiler.executor.ContainedExecutor;
 import com.uber.athenax.vm.compiler.executor.JobDescriptor;
@@ -30,17 +29,15 @@ import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.hadoop.fs.Path;
 
 import java.io.StringReader;
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Planner {
   private static final int DEFAULT_IDENTIFIER_MAX_LENGTH = 128;
 
-  private final Map<String, AthenaXTableCatalog> inputs;
-  private final AthenaXTableCatalog outputs;
+  private List<String> outputs;
 
-  public Planner(Map<String, AthenaXTableCatalog> inputs, AthenaXTableCatalog outputs) {
-    this.inputs = inputs;
+  public Planner(List<String> outputs) {
     this.outputs = outputs;
   }
 
@@ -49,7 +46,6 @@ public class Planner {
     Validator validator = new Validator();
     validator.validateQuery(stmts);
     JobDescriptor job = new JobDescriptor(
-        inputs,
         validator.userDefinedFunctions(),
         outputs,
         parallelism,

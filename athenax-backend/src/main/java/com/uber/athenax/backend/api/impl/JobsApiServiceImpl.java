@@ -18,16 +18,16 @@
 
 package com.uber.athenax.backend.api.impl;
 
-import com.uber.athenax.backend.api.JobDefinition;
-import com.uber.athenax.backend.api.JobsApiService;
-import com.uber.athenax.backend.api.NotFoundException;
+import com.uber.athenax.backend.api.*;
 import com.uber.athenax.backend.server.ServerContext;
 import org.apache.http.HttpStatus;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @javax.annotation.Generated(
@@ -55,7 +55,10 @@ public class JobsApiServiceImpl extends JobsApiService {
       if (job == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       } else {
-        return Response.ok(job).build();
+        ExtendedJobDefinition jobDefinition = new ExtendedJobDefinition().definition(job).uuid(jobUUID);
+        InstanceStatus instanceStatus = ctx.instanceManager().getJobInstanceStatus(jobUUID);
+        JobStatus jobStatus = new JobStatus().definition(jobDefinition).status(instanceStatus);
+        return Response.ok(jobStatus).build();
       }
     } catch (IOException e) {
       throw new NotFoundException(INVALID_REQUEST, e.getMessage());
@@ -65,7 +68,12 @@ public class JobsApiServiceImpl extends JobsApiService {
   @Override
   public Response listJob(SecurityContext securityContext) throws NotFoundException {
     try {
-      return Response.ok(ctx.jobManager().listJobs()).build();
+      List<JobStatus> jobStatusList = new ArrayList<>();
+      for (ExtendedJobDefinition jf : ctx.jobManager().listJobs()) {
+        InstanceStatus instanceStatus = ctx.instanceManager().getJobInstanceStatus(jf.getUuid());
+        jobStatusList.add(new JobStatus().definition(jf).status(instanceStatus));
+      }
+      return Response.ok(jobStatusList).build();
     } catch (IOException e) {
       throw new NotFoundException(INVALID_REQUEST, e.getMessage());
     }

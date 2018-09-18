@@ -58,6 +58,11 @@ public class ContainedExecutor {
     File jvm = new File(new File(System.getProperty("java.home"), "bin"), "java");
     ArrayList<String> ops = new ArrayList<>();
     ops.add(jvm.toString());
+
+    // Add below lines to debug compilation process
+//    ops.add("-Xdebug");
+//    ops.add("-Xrunjdwp:transport=dt_socket,address=7079,server=y,suspend=y");
+
     ops.add("-classpath");
     ops.add(System.getProperty("java.class.path"));
     String javaLibPath = System.getProperty("java.library.path");

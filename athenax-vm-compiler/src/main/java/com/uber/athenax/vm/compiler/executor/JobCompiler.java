@@ -18,6 +18,7 @@
 
 package com.uber.athenax.vm.compiler.executor;
 
+import com.oppo.dc.ostream.catalog.OStreamTableCatalogProvider;
 import com.uber.athenax.vm.api.functions.AthenaXAggregateFunction;
 import com.uber.athenax.vm.api.functions.AthenaXScalarFunction;
 import com.uber.athenax.vm.api.functions.AthenaXTableFunction;
@@ -30,6 +31,7 @@ import org.apache.flink.streaming.api.graph.StreamGraph;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.ExternalCatalogTable;
+import org.apache.flink.table.factories.TableFactoryUtil;
 import org.apache.flink.table.functions.AggregateFunction;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.apache.flink.table.functions.TableFunction;
@@ -52,6 +54,8 @@ public class JobCompiler {
   private static final Logger LOG = LoggerFactory.getLogger(JobCompiler.class);
   private final StreamTableEnvironment env;
   private final JobDescriptor job;
+
+  private final OStreamTableCatalogProvider catalogProvider = new OStreamTableCatalogProvider();
 
   JobCompiler(StreamTableEnvironment env, JobDescriptor job) {
     this.job = job;
@@ -106,8 +110,12 @@ public class JobCompiler {
         .registerUdfs()
         .registerInputCatalogs();
     Table table = env.sqlQuery(job.sql());
-    for (String t : job.outputs().listTables()) {
-      table.writeToSink(getOutputTable(job.outputs().getTable(t)));
+
+    AthenaXTableCatalog outputCatalog = catalogProvider.getOutputCatalog("", job.outputs());
+    for (String t : job.outputs()) {
+      ExternalCatalogTable tb = outputCatalog.getTable(t);
+      env.registerTableSink(t,TableFactoryUtil.findAndCreateTableSink(env, tb));
+      table.insertInto(t);
     }
     StreamGraph streamGraph = exeEnv.getStreamGraph();
     return streamGraph.getJobGraph();
@@ -146,7 +154,7 @@ public class JobCompiler {
   }
 
   private JobCompiler registerInputCatalogs() {
-    for (Map.Entry<String, AthenaXTableCatalog> e : job.inputs().entrySet()) {
+    for (Map.Entry<String, AthenaXTableCatalog> e : catalogProvider.getInputCatalog("").entrySet()) {
       LOG.debug("Registering input catalog {}", e.getKey());
       env.registerExternalCatalog(e.getKey(), e.getValue());
     }

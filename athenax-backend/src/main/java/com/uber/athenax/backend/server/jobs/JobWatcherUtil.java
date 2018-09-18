@@ -40,8 +40,8 @@ import static org.apache.hadoop.yarn.api.records.YarnApplicationState.NEW_SAVING
 import static org.apache.hadoop.yarn.api.records.YarnApplicationState.RUNNING;
 import static org.apache.hadoop.yarn.api.records.YarnApplicationState.SUBMITTED;
 
-final class JobWatcherUtil {
-  private static final EnumSet<YarnApplicationState> ALIVE_STATE =
+final public class JobWatcherUtil {
+  public static final EnumSet<YarnApplicationState> ALIVE_STATE =
       EnumSet.of(NEW, NEW_SAVING, SUBMITTED, ACCEPTED, RUNNING);
 
   private JobWatcherUtil() {
@@ -149,9 +149,14 @@ final class JobWatcherUtil {
   }
 
   static JobDefinitionDesiredstate computeActualState(InstanceInfo info) {
+    // jerryjzhang: substract resource usage of applicaiton master, otherwise
+    //              state comparison will always fail
     JobDefinitionResource r = new JobDefinitionResource()
-        .memory(info.status().getAllocatedMB())
-        .vCores(info.status().getAllocatedVCores());
+        .memory(info.status().getAllocatedMB() - 1024)
+        .vCores(info.status().getAllocatedVCores() - 1)
+        .queue(info.queue())
+        .executionSlots(1L); // hard-coded for now
+
     JobDefinitionDesiredstate s = new JobDefinitionDesiredstate()
         .clusterId(info.clusterName())
         .resource(r);
