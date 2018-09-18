@@ -154,7 +154,9 @@ final public class JobWatcherUtil {
     JobDefinitionResource r = new JobDefinitionResource()
         .memory(info.status().getAllocatedMB() - 1024)
         .vCores(info.status().getAllocatedVCores() - 1)
-        .queue(info.queue());
+        .queue(info.queue())
+        .executionSlots(1L); // hard-coded for now
+
     JobDefinitionDesiredstate s = new JobDefinitionDesiredstate()
         .clusterId(info.clusterName())
         .resource(r);
